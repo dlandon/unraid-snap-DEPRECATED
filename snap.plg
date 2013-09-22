@@ -1,0 +1,201 @@
+<?xml version='1.0' standalone='yes'?>
+<PLUGIN>
+
+<!--
+This Plugin installs SNAP for UnRaid.
+All dependencies are installed as needed and everything is controlable from the webgui
+
+Filename: Snap-5.0-1.plg
+-->
+
+<FILE Name="/tmp/preSnapInstallCleanup.sh"  Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+if [ -d /tmp/snap ]
+then
+	rm -r /tmp/snap
+fi
+if [ -f /tmp/latestSnapVer ]
+then
+	rm /tmp/latestSnapVer 
+fi
+if [ -f /tmp/prepareForSnapInstall.sh ]
+then
+	rm /tmp/prepareForSnapInstall.sh
+fi
+
+]]>
+</INLINE>
+</FILE>
+
+
+
+<FILE Name="/tmp/prepareForSnapInstall.sh"  Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+##rm -r /boot/config/plugins/snap
+
+
+# check if snap is already installed.
+if [ -f /boot/config/plugins/snap/snap.sh ]
+then
+	echo "snap exists" >>/tmp/snap.log
+	# SNAP is installed
+
+	# load the existing web component.
+	echo "Loading web component" >>/tmp/snap.log
+	cd /usr/local/emhttp/plugins
+	if [ -d /usr/local/emhttp/plugins/snap ]
+	then
+		rm -r /usr/local/emhttp/plugins/snap
+	fi
+	if [ -f /usr/local/emhttp/plugins/snap_web.tgz ]
+	then
+		rm /usr/local/emhttp/plugins/snap_web.tgz
+	fi
+	# install web component
+	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins
+	/usr/bin/tar -xzf snap_web.tgz
+	rm /usr/local/emhttp/plugins/snap_web.tgz
+
+else
+	# Snap isn't installed yet.
+	echo "snap not installed yet." >>/tmp/snap.log
+
+
+	wget -O /tmp/latestSnapVer http://code.google.com/p/unraid-snap/downloads/detail?name=LatestSnapVersion&can=2&q=#makechanges
+	sleep 1
+	#cat /tmp/latestSnapVer
+	checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion' `
+	if [ -n "$checkit" ]
+	then
+		versionCode=`/usr/bin/grep -o 'version=[0-9].[0-9][0-9]' /tmp/latestSnapVer|head -1`
+		latestVersion=`echo "$versionCode"|/usr/bin/cut -d'=' -f2`
+		echo "version is=$latestVersion" |tee -a /tmp/snap.log
+		
+		
+	else
+		echo "Error: Unable to download LatestSnapVersion information from googlecode." |tee -a  /tmp/snap.log
+		exit
+			
+	fi
+
+	
+	if [ -d /tmp/snap ]
+	then
+		rm -r /tmp/snap
+	fi
+	if [ -f /tmp/installSnap_Code.sh ]
+	then
+		rm /tmp/installSnap_Code.sh 
+	fi
+	echo "Downloading bundle" |tee -a  /tmp/snap.log
+	
+	cd /tmp
+	mkdir snap
+	cd /tmp/snap
+
+	# Download the bundle.
+	code="<?xml version='1.0' standalone='yes'?><PLUGIN><FILE Name='/tmp/snap/snapBundle.tar' ><URL>http://unraid-snap.googlecode.com/files/snap-$latestVersion.tar</URL></FILE></PLUGIN>"
+	echo "$code" > /boot/config/plugins/Download_SNAP_bundle.plg
+	/usr/local/sbin/installplg /boot/config/plugins/Download_SNAP_bundle.plg
+	echo "Bundle downloaded" >>/tmp/snap.log
+	rm /boot/config/plugins/Download_SNAP_bundle.plg
+	cd /tmp/snap
+
+	# extract the bundle.
+	echo "extracting bundle" >>/tmp/snap.log
+	cd /tmp/snap
+	/usr/bin/tar -xf snapBundle.tar
+
+
+	# install SNAP
+	echo "install SNAP" >>/tmp/snap.log
+	cd /tmp/snap
+	pwd >>/tmp/snap.log
+	
+	echo "creating /tmp/snap/snapCode directory" >> /tmp/snap.log
+	/usr/bin/mkdir /tmp/snap/snapCode  
+	echo "copying /tmp/snap/snapCode.tar /tmp/snap/snapCode" >> /tmp/snap.log
+	cp /tmp/snap/snapCode.tar /tmp/snap/snapCode
+
+	
+	echo "listing files in /tmp/snap" >> /tmp/snap.log
+	find /tmp/snap -print >>/tmp/snap.log
+	cd /tmp/snap/snapCode
+	echo "extracting /tmp/snap/snapCode.tar" >>/tmp/snap.log
+	
+	/usr/bin/tar -xf ./snapCode.tar
+	echo 'extracted /tmp/snap/snapCode.tar' >>/tmp/snap.log
+	if [ -d /tmp/snap/snapCode ]
+	then echo "snapCode dir exists" >>/tmp/snap.log
+	else echo "snapCode dir does not exist" >>/tmp/snap.log
+	fi
+	option="`/tmp/snap/snapCode/snap-Install.sh -t`"
+	echo "install option=$option" >>/tmp/snap.log
+
+	if [[ "$option" =~ 'reinstall' ]]
+	then
+		/tmp/snap/snapCode/snap-Install.sh -r
+	fi
+	if [[ "$option" =~ 'install' ]]
+	then
+		echo "Installing SNAP..."
+		/tmp/snap/snapCode/snap-Install.sh -i
+	fi
+	if [[ "$option" =~ 'update' ]]
+	then
+		/tmp/snap/snapCode/snap-Install.sh -r
+	fi
+	# copy the web component to snap folder to be installed every boot cycle.
+	echo "copying web component" >>/tmp/snap.log
+	
+	cp /tmp/snap/snap_web.tgz /boot/config/plugins/snap/snap_web.tgz
+
+	# install the web component
+	echo "installing web component" >>/tmp/snap.log
+	cd /usr/local/emhttp/plugins
+	rm -r /usr/local/emhttp/plugins/snap
+	rm /usr/local/emhttp/plugins/snap_web.tgz
+	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins
+	/usr/bin/tar -xzf snap_web.tgz
+	rm /usr/local/emhttp/plugins/snap_web.tgz
+
+fi
+
+#
+
+
+
+]]>
+</INLINE>
+</FILE>
+
+
+
+<FILE Name="/tmp/postSnapInstallCleanup.sh"  Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+if [ -f /tmp/preSnapInstallCleanup.sh ]
+then
+	rm /tmp/preSnapInstallCleanup.sh
+fi
+if [ -f /tmp/prepareForSnapInstall.sh ]
+then
+	rm /tmp/prepareForSnapInstall.sh 
+fi
+
+# dfl Start snap
+/boot/config/plugins/snap/snap.sh -b
+
+]]>
+</INLINE>
+</FILE>
+
+
+
+</PLUGIN>
+
