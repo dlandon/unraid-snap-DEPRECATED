@@ -1,4 +1,1 @@
-This file is a placeholder to provide the latest released version of SNAP.
-This file is located at http://unraid-snap.googlecode.com/files/CurrentSnapVersion
-The version information isn't in the file however, it's in the labels on the page where the file is located.
-That page is http://code.google.com/p/unraid-snap/downloads/detail?name=snap-5.01.tar&can=2&q=#makechanges
+LatestSnapVersion=5.10
