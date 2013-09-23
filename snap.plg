@@ -65,12 +65,12 @@ else
 	echo "snap not installed yet." >>/tmp/snap.log
 
 
-	wget -O /tmp/latestSnapVer https://github.com/dlandon/unraid-snap/blob/master/LatestSnapVersion --no-check-certificate
+	wget -t2 -q -O /tmp/latestSnapVer --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion
 	sleep 1
-	checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion' `
+	checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion=' `
 	if [ -n "$checkit" ]
 	then
-		versionCode=`/usr/bin/grep -o 'version=[0-9].[0-9][0-9]' /tmp/latestSnapVer|head -1`
+		versionCode=`/usr/bin/grep -o 'Version=[0-9].[0-9][0-9]' /tmp/latestSnapVer|head -1`
 		latestVersion=`echo "$versionCode"|/usr/bin/cut -d'=' -f2`
 		echo "version is=$latestVersion" |tee -a /tmp/snap.log
 	else
@@ -93,7 +93,7 @@ else
 	cd /tmp/snap
 
 	# Download the bundle.
-	code="<?xml version='1.0' standalone='yes'?><PLUGIN><FILE Name='/tmp/snap/snapBundle.tar' ><URL>https://github.com/dlandon/unraid-snap/blob/master/snap-$latestVersion.tar  --no-check-certificate</URL></FILE></PLUGIN>"
+	code="<?xml version='1.0' standalone='yes'?><PLUGIN><FILE Name='/tmp/snap/snapBundle.tar' ><URL>--no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-$latestVersion.tar</URL></FILE></PLUGIN>"
 	echo "$code" > /boot/config/plugins/Download_SNAP_bundle.plg
 	/usr/local/sbin/installplg /boot/config/plugins/Download_SNAP_bundle.plg
 	echo "Bundle downloaded" >>/tmp/snap.log
