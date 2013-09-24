@@ -9,7 +9,7 @@ Add storage devices to an unRAID server without them being part of the unRAID ar
 SNAP Installation
 =================
 
-To install SNAP you need to download the snap.plg and put it in the /boot/config/plugins directory.  You can download the file directly from GitHub and then browse to your flash drive and copy it to the /config/plugins directory or use a telnet session to download the file directly from GitHub with wget.  To install the plugin file, use a telnet session to your server, log in to the server, and then issue the following commsnds:
+To install SNAP you need to download the snap.plg and put it in the /boot/config/plugins directory.  You can download the file directly from GitHub and then browse to your flash drive and copy it to the /config/plugins directory or use a telnet session to download the file directly from GitHub with wget.  To install the plugin file, use a telnet session to your server, log in to the server, and then issue the following commands:
 
 cd /boot/config/plugins
 
