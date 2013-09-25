@@ -30,3 +30,10 @@ If you are using NTFS disk drives and need to write on them, you will need the n
 copy /boot/config/plugins/snap/ntfs-3g-2011.1.15-i486-1.txz /boot/extra
 
 Reboot your server.  This will install the ntfs-3g package.
+
+
+Revision History
+================
+
+Version 5.10 - Initial release.
+Version 5.11 - Fixed drive busy detection and some unmount problems.
