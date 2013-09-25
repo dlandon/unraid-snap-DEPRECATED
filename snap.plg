@@ -2,10 +2,10 @@
 <PLUGIN>
 
 <!--
-This Plugin installs SNAP for UnRAID.
-All dependencies are installed as needed and everything is controllable from the webgui.
+This Plugin installs SNAP for UnRaid.
+All dependencies are installed as needed and everything is controlable from the webgui.
 
-Filename: Snap.plg
+Filename: snap.plg
 -->
 
 <FILE Name="/tmp/preSnapInstallCleanup.sh"  Run="/bin/bash">
@@ -36,13 +36,14 @@ fi
 <![CDATA[
 #!/bin/bash
 #
-# Check if snap is already installed.
+# check if snap is already installed.
 #
 if [ -f /boot/config/plugins/snap/snap.sh ]
 then
 	echo "snap exists" >>/tmp/snap.log
 	#
-	# SNAP is installed.
+	# SNAP is installed
+	#
 	# Load the existing web component.
 	#
 	echo "Loading web component" >>/tmp/snap.log
@@ -56,7 +57,7 @@ then
 		rm /usr/local/emhttp/plugins/snap_web.tgz
 	fi
 	#
-	# Install web component.
+	# install web component
 	#
 	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins
 	/usr/bin/tar -xzf snap_web.tgz
@@ -66,6 +67,10 @@ else
 	# Snap isn't installed yet.
 	#
 	echo "snap not installed yet." >>/tmp/snap.log
+
+	#
+	# Download the snap version file.
+	#
 	wget -t2 -q -O /tmp/latestSnapVer --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion
 	sleep 1
 	checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion=' `
@@ -79,9 +84,6 @@ else
 		exit
 	fi
 	
-	#
-	# Prepare for the download.
-	#
 	if [ -d /tmp/snap ]
 	then
 		rm -r /tmp/snap
@@ -99,11 +101,8 @@ else
 	#
 	# Download the bundle.
 	#
-	code="<?xml version='1.0' standalone='yes'?><PLUGIN><FILE Name='/tmp/snap/snapBundle.tar' ><URL>--no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-$latestVersion.tar</URL></FILE></PLUGIN>"
-	echo "$code" > /boot/config/plugins/Download_SNAP_bundle.plg
-	/usr/local/sbin/installplg /boot/config/plugins/Download_SNAP_bundle.plg
+	wget -t2 -q -O /tmp/snap/snapBundle.tar --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-$latestVersion.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
-	rm /boot/config/plugins/Download_SNAP_bundle.plg
 	cd /tmp/snap
 
 	#
@@ -114,7 +113,7 @@ else
 	/usr/bin/tar -xf snapBundle.tar
 
 	#
-	# Install SNAP.
+	# Install SNAP
 	#
 	echo "install SNAP" >>/tmp/snap.log
 	cd /tmp/snap
@@ -152,24 +151,26 @@ else
 	then
 		/tmp/snap/snapCode/snap-Install.sh -r
 	fi
-	# copy the web component to snap folder to be installed every boot cycle.
+	#
+	# Copy the web component to snap folder to be installed every boot cycle.
+	#
 	echo "copying web component" >>/tmp/snap.log
 	
 	cp /tmp/snap/snap_web.tgz /boot/config/plugins/snap/snap_web.tgz
 
 	#
-	# Install the web component
+	# Install the web component (UI).
 	#
 	echo "installing web component" >>/tmp/snap.log
-	cd /usr/local/emhttp/plugins
-	rm -r /usr/local/emhttp/plugins/snap
-	rm /usr/local/emhttp/plugins/snap_web.tgz
-	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins
-	/usr/bin/tar -xzf snap_web.tgz
-	rm /usr/local/emhttp/plugins/snap_web.tgz
+	cd /usr/local/emhttp/plugins 2>>/dev/null
+	rm -r /usr/local/emhttp/plugins/snap 2>>/dev/null
+	rm /usr/local/emhttp/plugins/snap_web.tgz 2>>/dev/null
+	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins 2>>/dev/null
+	/usr/bin/tar -xzf snap_web.tgz 2>>/dev/null
+	rm /usr/local/emhttp/plugins/snap_web.tgz 2>>/dev/null
 fi
-
 ]]>
+
 </INLINE>
 </FILE>
 <FILE Name="/tmp/postSnapInstallCleanup.sh"  Run="/bin/bash">
@@ -186,11 +187,11 @@ then
 fi
 
 #
-# Start SNAP.
+# Start SNAP and mount any SNAP drives found.
 #
 /boot/config/plugins/snap/snap.sh -b
-
 ]]>
 </INLINE>
 </FILE>
+
 </PLUGIN>
