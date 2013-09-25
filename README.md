@@ -16,7 +16,9 @@ cd /boot/config/plugins
 wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap.plg
 
 Reboot your server
+
 or
+
 installplg snap.plg
 
 SNAP will install.
@@ -36,4 +38,5 @@ Revision History
 ================
 
 Version 5.10 - Initial release.
+
 Version 5.11 - Fixed drive busy detection and some unmount problems.
