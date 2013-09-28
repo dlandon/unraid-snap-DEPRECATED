@@ -24,7 +24,6 @@ if [ -f /tmp/prepareForSnapInstall.sh ]
 then
 	rm /tmp/prepareForSnapInstall.sh
 fi
-
 ]]>
 </INLINE>
 </FILE>
@@ -36,7 +35,7 @@ fi
 <![CDATA[
 #!/bin/bash
 #
-# check if snap is already installed.
+# Check if snap is already installed.
 #
 if [ -f /boot/config/plugins/snap/snap.sh ]
 then
@@ -187,7 +186,7 @@ then
 fi
 
 #
-# Start SNAP and mount any SNAP drives found.
+# Start SNAP and mount any SNAP (usb) drives found.
 #
 /boot/config/plugins/snap/snap.sh -b
 ]]>
