@@ -49,4 +49,4 @@ Version 5.10 - Initial release.
 
 Version 5.11 - Fixed drive busy detection and some unmount problems.
 
-Version 5.12 - Fixed mount and unmount of disks with multiple partitions.
+Version 5.12 - Fixed mount and unmount of disks with multiple partitions. SNAP should only mount the first partition on the disk.
