@@ -172,7 +172,7 @@ fi
 
 </INLINE>
 </FILE>
-<FILE Name="/tmp/postSnapInstallCleanup.sh"  Run="/bin/bash">
+<FILE Name="/tmp/SnapInstall.sh"  Run="/bin/bash">
 <INLINE>
 <![CDATA[
 #!/bin/bash
@@ -188,7 +188,9 @@ fi
 #
 # Start SNAP and mount any SNAP (usb) drives found.
 #
-/boot/config/plugins/snap/snap.sh -b
+/boot/config/plugins/snap/snap.sh -b &
+
+rm /tmp/SnapInstall.sh
 ]]>
 </INLINE>
 </FILE>
