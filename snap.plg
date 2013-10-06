@@ -71,7 +71,7 @@ else
 	# Download the snap version file.
 	#
 	wget -t2 -q -O /tmp/latestSnapVer --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion
-	sleep 1
+	sleep 2
 	checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion=' `
 	if [ -n "$checkit" ]
 	then
