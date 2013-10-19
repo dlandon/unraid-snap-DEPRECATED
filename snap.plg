@@ -8,10 +8,56 @@ All dependencies are installed as needed and everything is controlable from the 
 Filename: snap.plg
 -->
 
+<FILE Name="/boot/packages/utempter-1.1.5-i486-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.oregonstate.edu/slackware-13.37/slackware/a/utempter-1.1.5-i486-1.txz</URL>
+<MD5>efa4d897211fd5c3f3a027425d8126f8</MD5>
+</FILE>
+
+<FILE Name="/boot/packages/screen-4.0.3-i486-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.oregonstate.edu/slackware-13.37/slackware/ap/screen-4.0.3-i486-1.txz</URL>
+<MD5>1a59b0fdac921b858510d57e43f77543</MD5>
+</FILE>
+
+<FILE Name="/boot/packages/inotify-tools-3.14-i486-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.oregonstate.edu/slackware-13.37/slackware/a/inotify-tools-3.14-i486-1.txz</URL>
+<MD5>5aa51a1d2c56cab72c582c07ff907f9d</MD5>
+</FILE>
+
+<FILE Name="/var/log/plugins/screen">
+<INLINE>
+<![CDATA[
+
+]]>
+</INLINE>
+</FILE>
+
 <FILE Name="/tmp/preSnapInstallCleanup.sh"  Run="/bin/bash">
 <INLINE>
 <![CDATA[
 #!/bin/bash
+#
+# Remove some residue from earier versions.
+#
+if [ -f /boot/config/plugins/snap/screen-4.0.3-i468-1atv.plg ]
+then
+	rm /boot/config/plugins/snap/screen-4.0.3-i468-1atv.plg
+fi
+
+if [ -f /boot/config/plugins/snap/inotify-tools-3.8-i486-1.tgz ]
+then
+	rm /boot/config/plugins/snap/inotify-tools-3.8-i486-1.tgz
+fi
+
+if [ -f /boot/packages/inotify-tools-3.8-i486-1.tgz ]
+then
+	rm /boot/packages/inotify-tools-3.8-i486-1.tgz
+fi
+
+if [ -f /boot/config/plugins/snap/ntfs-3g-2011.1.15-i486-1.txz ]
+then
+	rm /boot/config/plugins/snap/ntfs-3g-2011.1.15-i486-1.txz
+fi
+
 if [ -d /tmp/snap ]
 then
 	rm -r /tmp/snap
@@ -27,8 +73,6 @@ fi
 ]]>
 </INLINE>
 </FILE>
-
-
 
 <FILE Name="/tmp/prepareForSnapInstall.sh"  Run="/bin/bash">
 <INLINE>
@@ -191,6 +235,16 @@ fi
 /boot/config/plugins/snap/snap.sh -b &
 
 rm /tmp/SnapInstall.sh
+]]>
+</INLINE>
+</FILE>
+
+<!-- event handler -->
+<FILE Name="/usr/local/emhttp/plugins/snap/event/stopped" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/boot/config/plugins/snap/snap.sh -unmountAll 2>&1 >/dev/null
 ]]>
 </INLINE>
 </FILE>

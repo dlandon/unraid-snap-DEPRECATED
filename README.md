@@ -29,15 +29,15 @@ NTFS Write Driver
 
 If you are using NTFS disk drives and need to write on them, you will need the ntfs-3g driver installed.  unRAID only supports reading from NTFS devices.  To enable NTFS write capability, do the following:
 
-cp /boot/config/plugins/snap/ntfs-3g-2011.1.15-i486-1.txz /boot/extra
+cd /boot/config/plugins
+
+wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g.plg
 
 Reboot your server.
 
 or
 
-cd /boot/extra
-
-installpkg ntfs-3g-2011.1.15-i486-1.txz
+installplg ntfs-3g.plg
 
 This will install the ntfs-3g package.
 
@@ -52,3 +52,5 @@ Version 5.11 - Fixed drive busy detection and some unmount problems.
 Version 5.12 - Fixed mount and unmount of disks with multiple partitions. SNAP should only mount the first partition on the disk.
 
 Version 5.13 - Minor UI issues.
+
+Version 5.14 - SNAP drives are now unmounted when the unRAID array is stopped.  Moved packages to the snap.plg where they belong.  Updated to latest inotify package.  Fixed "No Fs" indicator when stopping a preclear and the disk has a valid file system.  Created ntfs-3g plugin to install ntfs-3g driver needed for writing to ntfs disks.
