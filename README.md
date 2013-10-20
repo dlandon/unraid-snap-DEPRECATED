@@ -27,6 +27,8 @@ SNAP will install.
 NTFS Write Driver
 =================
 
+Before you install this plugin, delete any ntfs-3g packages from the /boot/extra directory otherwise you could end up with multiple package versions.  I know this is messy, but until unRAID package management is sorted out, this is the best I can do.
+
 If you are using NTFS disk drives and need to write on them, you will need the ntfs-3g driver installed.  unRAID only supports reading from NTFS devices.  To enable NTFS write capability, do the following:
 
 cd /boot/config/plugins
