@@ -56,3 +56,7 @@ Version 5.12 - Fixed mount and unmount of disks with multiple partitions. SNAP s
 Version 5.13 - Minor UI issues.
 
 Version 5.14 - SNAP drives are now unmounted when the unRAID array is stopped.  Moved packages to the snap.plg where they belong.  Updated to latest inotify package.  Fixed "No Fs" indicator when stopping a preclear and the disk has a valid file system.  Created ntfs-3g plugin to install ntfs-3g driver needed for writing to ntfs disks.
+
+Version 5.15 - More organizational changes.  All packages are now managed by the SNAP plugin.  Updated all packages to Slackware 14.0 - screen, libelf, inotify, and utempter.  I think this fixed a few webgui lockups I experienced when preclearing disks.  It hasn't happened since this update on my test server.  I have added a new command parameter -MW to snap.sh to wait for a disk to not be busy and then unmount it.  This is handy in your hot plug scripts to be sure the drive is successfully unmounted.  If the disk is busy, the -M command would not unmount the disk.
+
+Version 5.16 - Fixed an update problem.  The SNAP plugin was not installed correctly and did not show up in the webgui.

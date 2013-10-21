@@ -226,7 +226,7 @@ rm /tmp/SnapInstall.sh
 <![CDATA[
 Menu="OtherSettings"
 Icon="snap.png"
-Version="5.15"
+Version="5.16"
 Author="David Lewis"
 Type="php"
 Title="SNAP"
