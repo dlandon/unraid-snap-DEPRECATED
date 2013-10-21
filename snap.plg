@@ -221,6 +221,19 @@ rm /tmp/SnapInstall.sh
 </INLINE>
 </FILE>
 
+<FILE Name="/usr/local/emhttp/plugins/snap/snap.page">
+<INLINE>
+<![CDATA[
+Menu="OtherSettings"
+Icon="snap.png"
+Version="5.15"
+Author="David Lewis"
+Type="php"
+Title="SNAP"
+]]>
+</INLINE>
+</FILE>
+
 <!-- event handler -->
 <FILE Name="/usr/local/emhttp/plugins/snap/event/stopped" Mode="0770">
 <INLINE>
