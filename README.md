@@ -60,3 +60,5 @@ Version 5.14 - SNAP drives are now unmounted when the unRAID array is stopped.  
 Version 5.15 - More organizational changes.  All packages are now managed by the SNAP plugin.  Updated all packages to Slackware 14.0 - screen, libelf, inotify, and utempter.  I think this fixed a few webgui lockups I experienced when preclearing disks.  It hasn't happened since this update on my test server.  I have added a new command parameter -MW to snap.sh to wait for a disk to not be busy and then unmount it.  This is handy in your hot plug scripts to be sure the drive is successfully unmounted.  If the disk is busy, the -M command would not unmount the disk.
 
 Version 5.16 - Fixed an update problem.  The SNAP plugin was not installed correctly and did not show up in the webgui.
+
+Version 5.17 - Removed preclear and screen, libelf, and utempter packages.  Decided that it was best that SNAP not do preclears.

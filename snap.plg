@@ -8,32 +8,9 @@ All dependencies are installed as needed and everything is controlable from the 
 Filename: snap.plg
 -->
 
-<FILE Name="/boot/packages/utempter-1.1.5-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu/slackware-14.0/slackware/a/utempter-1.1.5-i486-1.txz</URL>
-<MD5>efa4d897211fd5c3f3a027425d8126f8</MD5>
-</FILE>
-
-<FILE Name="/boot/packages/libelf-0.8.13-i486-2.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu/slackware-14.0/slackware/l/libelf-0.8.13-i486-2.txz</URL>
-<MD5>665538054d9cce62d93d39da2b7a877d</MD5>
-</FILE>
-
-<FILE Name="/boot/packages/screen-4.0.3-i486-3.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu/slackware-14.0/slackware/ap/screen-4.0.3-i486-3.txz</URL>
-<MD5>a4c308a76337002ddd3e30cdb08888bd</MD5>
-</FILE>
-
 <FILE Name="/boot/packages/inotify-tools-3.14-i486-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.oregonstate.edu/slackware-14.0/slackware/a/inotify-tools-3.14-i486-1.txz</URL>
 <MD5>5aa51a1d2c56cab72c582c07ff907f9d</MD5>
-</FILE>
-
-<FILE Name="/var/log/plugins/screen">
-<INLINE>
-<![CDATA[
-
-]]>
-</INLINE>
 </FILE>
 
 <FILE Name="/tmp/preSnapInstallCleanup.sh"  Run="/bin/bash">
@@ -155,6 +132,7 @@ else
 	echo "extracting /tmp/snap/snapCode.tar" >>/tmp/snap.log
 	
 	/usr/bin/tar -xf ./snapCode.tar
+	rm ./snapCode.tar
 	echo 'extracted /tmp/snap/snapCode.tar' >>/tmp/snap.log
 	if [ -d /tmp/snap/snapCode ]
 	then echo "snapCode dir exists" >>/tmp/snap.log
@@ -226,7 +204,7 @@ rm /tmp/SnapInstall.sh
 <![CDATA[
 Menu="OtherSettings"
 Icon="snap.png"
-Version="5.16"
+Version="5.17"
 Author="David Lewis"
 Type="php"
 Title="SNAP"
