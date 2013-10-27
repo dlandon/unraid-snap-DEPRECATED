@@ -62,3 +62,5 @@ Version 5.15 - More organizational changes.  All packages are now managed by the
 Version 5.16 - Fixed an update problem.  The SNAP plugin was not installed correctly and did not show up in the webgui.
 
 Version 5.17 - Removed preclear and screen, libelf, and utempter packages.  Decided that it was best that SNAP not do preclears.
+
+Version 5.18 - Made modifications to standardize plugin for plugin managers like Control Panel.
