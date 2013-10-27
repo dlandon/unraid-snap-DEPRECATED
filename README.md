@@ -9,7 +9,7 @@ Copyright (C) 2010-2013 by Dave Lewis (Queeg) & Dan Landon (dlandon)
 
 The GNU General Public License can be viewed here:
 
-https://github.com/dlandon/unraid-snap/raw/master/"GNU General Public License.txt"
+https://github.com/dlandon/unraid-snap/raw/master/GNUGeneralPublicLicense.txt
 
 SNAP Installation
 =================
