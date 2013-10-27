@@ -1,6 +1,11 @@
 <?xml version='1.0' standalone='yes'?>
-<PLUGIN>
 
+<!DOCTYPE PLUGIN [
+<!ENTITY plugin "SNAP">
+<!ENTITY plgver "1.0">
+]>
+
+<PLUGIN>
 <!--
 This Plugin installs SNAP for UnRaid.
 All dependencies are installed as needed and everything is controlable from the webgui.
@@ -197,6 +202,10 @@ fi
 rm /tmp/SnapInstall.sh
 ]]>
 </INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/snap/snap.png">
+<URL>-q --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap.png</URL>
 </FILE>
 
 <FILE Name="/usr/local/emhttp/plugins/snap/snap.page">
