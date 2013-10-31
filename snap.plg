@@ -299,6 +299,8 @@ snap_updateapp()
 				/boot/config/plugins/snap/snap.sh -installUpdate-step2
 				/usr/local/sbin/installplg /boot/config/plugins/snap.plg 2>/dev/null
 				echo "...OK"
+			else
+				echo "SNAP could not update..."
 			fi
 		else
 			echo "Download failed, update aborted!"
