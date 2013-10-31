@@ -2,7 +2,7 @@
 
 <!DOCTYPE PLUGIN [
 <!ENTITY plugin "SNAP">
-<!ENTITY plgver "1.2">
+<!ENTITY plgver "1.3">
 ]>
 
 <PLUGIN>
@@ -237,6 +237,7 @@ rm /tmp/SnapInstall.sh
 
 snap_start()
 {
+	/boot/config/plugins/snap/snap.sh -enable
 	/boot/config/plugins/snap/snap.sh -b
 	echo "... Snap started"
 	sleep 1
