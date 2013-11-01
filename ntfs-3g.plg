@@ -7,9 +7,9 @@
 The plugin provides ntfs-3g support for unRAID systems.
 
 -->
-<FILE Name="/boot/packages/ntfs-3g-2012.1.15-i486-2.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu/slackware-14.0/slackware/a/ntfs-3g-2012.1.15-i486-2.txz</URL>
-<MD5>d5855570d6c3e4900721993c3f2feb0d</MD5>
+<FILE Name="/boot/packages/ntfs-3g-2010.3.6-i486-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.oregonstate.edu/slackware-13.1/slackware/a/ntfs-3g-2010.3.6-i486-1.txz</URL>
+<MD5>4285ccc1f78512bc14bd77ff52051e92</MD5>
 </FILE>
 
 </PLUGIN>
