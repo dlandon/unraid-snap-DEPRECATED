@@ -3,6 +3,7 @@
 
 <!--
 2013-10-19 - first release
+2014-01-24 - Modified for unRAID 6 (64 bit)
 
 The plugin provides ntfs-3g support for unRAID systems.
 
@@ -28,9 +29,9 @@ rm -f /tmp/ntfs-prepare
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/packages/ntfs-3g-2010.3.6-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu/slackware-13.1/slackware/a/ntfs-3g-2010.3.6-i486-1.txz</URL>
-<MD5>4285ccc1f78512bc14bd77ff52051e92</MD5>
+<FILE Name="/boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.oregonstate.edu/slackware64-14.1/slackware64/a/ntfs-3g-2013.1.13-x86_64-1.txz</URL>
+<MD5>de646f44d881b6c4292e353b717792cd</MD5>
 </FILE>
 
 </PLUGIN>

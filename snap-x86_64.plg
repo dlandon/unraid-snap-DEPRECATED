@@ -27,7 +27,7 @@ along with SNAP.  If not, see <http://www.gnu.org/licenses/>.
 This Plugin installs SNAP for UnRaid.
 All dependencies are installed as needed and everything is controlable from the webgui.
 
-Filename: snap.plg
+Filename: snap-x86_64.plg
 -->
 
 <FILE Name="/tmp/SnapPrepare" Run="/bin/bash">
@@ -50,9 +50,9 @@ rm -f /tmp/SnapPrepare
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/packages/inotify-tools-3.14-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu/slackware-14.0/slackware/a/inotify-tools-3.14-i486-1.txz</URL>
-<MD5>5aa51a1d2c56cab72c582c07ff907f9d</MD5>
+<FILE Name="/boot/packages/inotify-tools-3.14-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.oregonstate.edu/slackware64-14.1/slackware64/a/inotify-tools-3.14-x86_64-1.txz</URL>
+<MD5>54d5c31bd9b6ed66b5535a5256ef094c</MD5>
 </FILE>
 
 <FILE Name="/tmp/preSnapInstallCleanup.sh"  Run="/bin/bash">
@@ -281,11 +281,11 @@ snap_restart()
 
 snap_updateplg()
 {
-	if [ -f /boot/config/plugins/snap.plg ];
+	if [ -f /boot/config/plugins/snap-x86_64.plg ];
 	then
 		echo "Downloading plugin..."
-		wget -t2 -q -O /tmp/snap.plg --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap.plg
-		if [ ! -f /tmp/snap.plg ];
+		wget -t2 -q -O /tmp/snap-x86_64.plg --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg
+		if [ ! -f /tmp/snap-x86_64.plg ];
 		then
 			echo "Download failed, update aborted!"
 			sleep 2
@@ -294,9 +294,9 @@ snap_updateplg()
 			sleep 1
 			echo  "Upgrading plugin..."
 			sleep 1
-			mv -f /boot/config/plugins/snap.plg /boot/config/plugins/snap/snap.plg.sav 2>/dev/null
-			mv -f /tmp/snap.plg /boot/config/plugins/snap.plg 2>/dev/null
-			/usr/local/sbin/installplg /boot/config/plugins/snap.plg 2>/dev/null
+			mv -f /boot/config/plugins/snap-x86_64.plg /boot/config/plugins/snap/snap-x86_64.plg.sav 2>/dev/null
+			mv -f /tmp/snap-x86_64.plg /boot/config/plugins/snap-x86_64.plg 2>/dev/null
+			/usr/local/sbin/installplg /boot/config/plugins/snap-x86_64.plg 2>/dev/null
 			echo "...OK"
 			sleep 1
 		fi
@@ -317,7 +317,7 @@ snap_updateapp()
 			if [ "$result" == "yes" ]
 			then
 				/boot/config/plugins/snap/snap.sh -installUpdate-step2
-				/usr/local/sbin/installplg /boot/config/plugins/snap.plg 2>/dev/null
+				/usr/local/sbin/installplg /boot/config/plugins/snap-x86_64.plg 2>/dev/null
 				echo "...OK"
 			else
 				echo "SNAP could not update..."
@@ -334,14 +334,14 @@ snap_plgver()
 {
 	case "$1" in
 	'local')
-		if [ -f /boot/config/plugins/snap.plg ]; then
-			version=$(grep "<\!ENTITY plgver " /boot/config/plugins/snap.plg | cut -d\" -f2)
+		if [ -f /boot/config/plugins/snap-x86_64.plg ]; then
+			version=$(grep "<\!ENTITY plgver " /boot/config/plugins/snap-x86_64.plg | cut -d\" -f2)
 		else
 			version=Unknown
 		fi
 	;;
 	'remote')
-		version=$(wget --no-check-certificate -q https://github.com/dlandon/unraid-snap/raw/master/snap.plg -O - | grep "<\!ENTITY plgver " | cut -d\" -f2)
+		version=$(wget --no-check-certificate -q https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg -O - | grep "<\!ENTITY plgver " | cut -d\" -f2)
 		if [ "$version" == "" ]; then
 			version=Unknown
 		fi
