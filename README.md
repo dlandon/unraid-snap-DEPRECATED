@@ -1,17 +1,19 @@
 SNAP for unRAID Server
 ======================
 
-Snap: Share Non-Array Partitions 
+SNAP: Share Non-Array Partitions 
 
 Add storage devices to an unRAID server without them being part of the unRAID array. Adding a device to SNAP means that it's filesystem will be mounted to make it available in linux and shared out to make it available on the network. SNAP is aware of the unRAID array drives and doesn't disturb any drives assigned to the array. 
 
-Copyright (C) 2010-2013 by Dave Lewis (Queeg) & Dan Landon (dlandon)
+Copyright (C) 2010-2014 by Dave Lewis (Queeg) & Dan Landon (dlandon)
 
 Licensed under the GNU General Public License.
 
 The GNU General Public License can be viewed here:
 
 https://github.com/dlandon/unraid-snap/raw/master/GNUGeneralPublicLicense.txt
+
+SNAP is now ready for unRAID v6 64bit.  There is a plugin for v5 and a separate plugin for v6.  Be sure to use the correct plugin for your version of unRAID.
 
 SNAP Installation
 =================
@@ -20,6 +22,8 @@ To install SNAP you need to download the snap.plg and put it in the /boot/config
 
 cd /boot/config/plugins
 
+unRAID v5
+=========
 wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap.plg
 
 Reboot your server
@@ -30,14 +34,30 @@ installplg snap.plg
 
 SNAP will install.
 
+unRAID v6
+=========
+wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg
+
+Reboot your server
+
+or
+
+installplg snap-x86_64.plg
+
+SNAP will install.
+
 
 NTFS Write Driver
 =================
+
+There is a NTFS driver plugin for v5 and a separate plugin for v6 of unRAID.  Be sure you use the correct plugin for your version of unRAID.
 
 Before you install this plugin, delete any ntfs-3g packages from the /boot/extra directory otherwise you could end up with multiple package versions.  I know this is messy, but until unRAID package management is sorted out, this is the best I can do.
 
 If you are using NTFS disk drives and need to write on them, you will need the ntfs-3g driver installed.  unRAID only supports reading from NTFS devices.  To enable NTFS write capability, do the following:
 
+unRAID v5
+=========
 cd /boot/config/plugins
 
 wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g.plg
@@ -47,6 +67,20 @@ Reboot your server.
 or
 
 installplg ntfs-3g.plg
+
+This will install the ntfs-3g package.
+
+unRAID v6
+=========
+cd /boot/config/plugins
+
+wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg
+
+Reboot your server.
+
+or
+
+installplg ntfs-3g-x86_64.plg
 
 This will install the ntfs-3g package.
 
@@ -73,3 +107,5 @@ Version 5.17 - Removed preclear and screen, libelf, and utempter packages.  Deci
 Version 5.18 - Made modifications to standardize plugin for plugin managers like Control Panel.
 
 Version 5.19 - Added copyright notices and GPL license.
+
+Version 5.20 - Released SNAP for unRAID v6. Aligned unRAID v5 SNAP to unRAID v6 SNAP.
