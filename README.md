@@ -109,3 +109,5 @@ Version 5.18 - Made modifications to standardize plugin for plugin managers like
 Version 5.19 - Added copyright notices and GPL license.
 
 Version 5.20 - Released SNAP for unRAID v6. Aligned unRAID v5 SNAP to unRAID v6 SNAP.
+
+Version 5.21 - Updated jQuery, jQuery ui, jQuery cookie, and fixed php errors.  Removed unused jQuery files.
