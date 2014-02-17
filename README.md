@@ -113,3 +113,5 @@ Version 5.20 - Released SNAP for unRAID v6. Aligned unRAID v5 SNAP to unRAID v6 
 Version 5.21 - Updated jQuery, jQuery ui, jQuery cookie, and fixed php errors.  Removed unused jQuery files.
 
 Version 5.22 - Fixed a situation where a drive was shared and not mounted.
+
+Version 5.23 - USB drives were not recognized and hot plugged in V6.  Changed SNAP so any hot pluggable drive is now hot plugged by SNAP.
