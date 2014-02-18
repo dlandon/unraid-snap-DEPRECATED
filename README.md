@@ -115,3 +115,5 @@ Version 5.21 - Updated jQuery, jQuery ui, jQuery cookie, and fixed php errors.  
 Version 5.22 - Fixed a situation where a drive was shared and not mounted.
 
 Version 5.23 - USB drives were not recognized and hot plugged in V6.  Changed SNAP so any hot pluggable drive is now hot plugged by SNAP.
+
+Version 5.24 - Fixed some incompatibilities with Dynamix.
