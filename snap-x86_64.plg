@@ -2,7 +2,7 @@
 
 <!DOCTYPE PLUGIN [
 <!ENTITY plugin "SNAP">
-<!ENTITY plgver "1.8">
+<!ENTITY plgver "1.9">
 ]>
 
 <PLUGIN>
@@ -430,7 +430,7 @@ esac
 <![CDATA[
 Menu="OtherSettings"
 Icon="snap.png"
-Version="5.24"
+Version="5.25"
 Author="Queeg"
 Type="php"
 Title="SNAP"
