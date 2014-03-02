@@ -121,3 +121,5 @@ Version 5.24 - Fixed some incompatibilities with Dynamix.
 Version 5.25 - Fixed a hot plug issue with some devices.
 
 Version 5.26 - SNAP will change themes (white/black) when working with Dynamix.
+
+Version 5.27 - Modified style sheet to more closely match Dynamix black theme colors.
