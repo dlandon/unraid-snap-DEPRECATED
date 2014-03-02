@@ -119,3 +119,5 @@ Version 5.23 - USB drives were not recognized and hot plugged in V6.  Changed SN
 Version 5.24 - Fixed some incompatibilities with Dynamix.
 
 Version 5.25 - Fixed a hot plug issue with some devices.
+
+Version 5.26 - SNAP will change themes (white/black) when working with Dynamix.
