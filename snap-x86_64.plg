@@ -114,6 +114,12 @@ then
 	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins
 	/usr/bin/tar -xzf snap_web.tgz
 	rm /usr/local/emhttp/plugins/snap_web.tgz
+
+	# remove our jQuery from snap.php if Dynamix is running
+	if [ -f /var/log/plugins/dynamix.webGui ]
+	then
+		sed -i -e 's/<script src="\/plugins\/snap\/jquery-2.1.0.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
+	fi
 else
 	#
 	# Snap isn't installed yet.
@@ -221,6 +227,12 @@ else
 	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins 2>>/dev/null
 	/usr/bin/tar -xzf snap_web.tgz 2>>/dev/null
 	rm /usr/local/emhttp/plugins/snap_web.tgz 2>>/dev/null
+
+	# remove our jQuery from snap.php if Dynamix is running
+	if [ -f /var/log/plugins/dynamix.webGui ]
+	then
+		sed -i -e 's/<script src="\/plugins\/snap\/jquery-2.1.0.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
+	fi
 fi
 ]]>
 
