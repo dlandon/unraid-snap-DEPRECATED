@@ -5,13 +5,9 @@ SNAP: Share Non-Array Partitions
 
 Add storage devices to an unRAID server without them being part of the unRAID array. Adding a device to SNAP means that it's filesystem will be mounted to make it available in linux and shared out to make it available on the network. SNAP is aware of the unRAID array drives and doesn't disturb any drives assigned to the array. 
 
-Copyright (C) 2010-2014 by Dave Lewis (Queeg) & Dan Landon (dlandon)
+Copyright (c) Copyright (C) 2010-2014, Dave Lewis or Queegtech.com
 
-Licensed under the GNU General Public License.
-
-The GNU General Public License can be viewed here:
-
-https://github.com/dlandon/unraid-snap/raw/master/GNUGeneralPublicLicense.txt
+All rights reserved.
 
 SNAP is now ready for unRAID v6 64bit.  There is a plugin for v5 and a separate plugin for v6.  Be sure to use the correct plugin for your version of unRAID.
 
