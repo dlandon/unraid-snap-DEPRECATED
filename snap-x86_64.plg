@@ -1,25 +1,40 @@
 <?xml version='1.0' standalone='yes'?>
 
 <!DOCTYPE PLUGIN [
-<!ENTITY plugin "SNAP">
-<!ENTITY plgver "2.1">
+<!ENTITY name      "SNAP">
+<!ENTITY author    "Queeg">
+<!ENTITY version   "5.28">
+<!ENTITY category  "Mount Non-array Disks">
+<!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
 
-<PLUGIN>
+<PLUGIN  name="&name;"
+         author="&author;"
+         version="&version;"
+         category="&category;">
+
+<!DOCTYPE PLUGIN [
+<!ENTITY plugin "SNAP">
+<!ENTITY plgver "2.2">
+]>
+
 <!--
-Copyright (C) 2010-2014 by Dave Lewis & Dan Landon
+Copyright (C) 2010-2014, Dave Lewis or Queegtech.com
 
-This file is part of the SNAP plugin for unRAID.
+All rights reserved.
 
-SNAP is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Redistribution and use in source and binary forms, without modification,
+are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Any redistribution or use is done solely for personal benefit and not for any
+   commercial purpose or for monetary gain.  Companies may install and use on
+   servers they own.  Commercial users, please notify owner within 30 days of installation.
 
-SNAP is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 
 You should have received a copy of the GNU General Public License
 along with SNAP.  If not, see <http://www.gnu.org/licenses/>.
@@ -33,7 +48,7 @@ Filename: snap-x86_64.plg
 <FILE Name="/tmp/SnapPrepare" Run="/bin/bash">
 <INLINE>
 # Wait until network is ready
-timer=30
+timer=60
 while [ $timer -gt 0 ]; do
 	gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
 	if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
@@ -114,12 +129,6 @@ then
 	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins
 	/usr/bin/tar -xzf snap_web.tgz
 	rm /usr/local/emhttp/plugins/snap_web.tgz
-
-	# remove our jQuery from snap.php if Dynamix is running
-	if [ -f /var/log/plugins/dynamix.webGui ]
-	then
-		sed -i -e 's/<script src="\/plugins\/snap\/jquery-2.1.0.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
-	fi
 else
 	#
 	# Snap isn't installed yet.
@@ -129,7 +138,7 @@ else
 	#
 	# Download the snap version file.
 	#
-	wget -t2 -q -O /tmp/latestSnapVer --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion
+	wget -t2 -q -O /tmp/latestSnapVer https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion-x86_64
 	sleep 2
 	checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion=' `
 	if [ -n "$checkit" ]
@@ -159,7 +168,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-$latestVersion.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-$latestVersion.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
@@ -227,12 +236,13 @@ else
 	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins 2>>/dev/null
 	/usr/bin/tar -xzf snap_web.tgz 2>>/dev/null
 	rm /usr/local/emhttp/plugins/snap_web.tgz 2>>/dev/null
+fi
 
-	# remove our jQuery from snap.php if Dynamix is running
-	if [ -f /var/log/plugins/dynamix.webGui ]
-	then
-		sed -i -e 's/<script src="\/plugins\/snap\/jquery-2.1.0.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
-	fi
+# remove our jQuery from snap.php if Dynamix is running
+if [ -f /var/log/plugins/dynamix.webGui ]
+then
+	sed -i -e 's/<script src="\/plugins\/snap\/jquery.cookie.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
+	sed -i -e 's/<script src="\/plugins\/snap\/jquery.qtip-1.0.0-rc3.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
 fi
 ]]>
 
@@ -296,7 +306,7 @@ snap_updateplg()
 	if [ -f /boot/config/plugins/snap-x86_64.plg ];
 	then
 		echo "Downloading plugin..."
-		wget -t2 -q -O /tmp/snap-x86_64.plg --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg
+		wget -t2 -q -O /tmp/snap-x86_64.plg https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg
 		if [ ! -f /tmp/snap-x86_64.plg ];
 		then
 			echo "Download failed, update aborted!"
@@ -353,7 +363,7 @@ snap_plgver()
 		fi
 	;;
 	'remote')
-		version=$(wget --no-check-certificate -q https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg -O - | grep "<\!ENTITY plgver " | cut -d\" -f2)
+		version=$(wget -q https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg -O - | grep "<\!ENTITY plgver " | cut -d\" -f2)
 		if [ "$version" == "" ]; then
 			version=Unknown
 		fi
@@ -374,7 +384,7 @@ snap_appver()
 		then
 			rm /tmp/latestSnapVer 2>>/dev/null
 		fi
-		wget --cookies=off -t2 -q -O /tmp/latestSnapVer --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion
+		wget --cookies=off -t2 -q -O /tmp/latestSnapVer https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion-x86_64
 		sleep 1
 		if [ -f /tmp/latestSnapVer ]
 		then
@@ -434,7 +444,7 @@ esac
 </FILE>
 
 <FILE Name="/usr/local/emhttp/plugins/snap/snap.png">
-<URL>-q --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap.png</URL>
+<URL>-q https://github.com/dlandon/unraid-snap/raw/master/snap.png</URL>
 </FILE>
 
 <FILE Name="/usr/local/emhttp/plugins/snap/snap.page">
@@ -442,20 +452,10 @@ esac
 <![CDATA[
 Menu="OtherSettings"
 Icon="snap.png"
-Version="5.27"
+Version="5.28"
 Author="Queeg"
 Type="php"
 Title="SNAP"
-]]>
-</INLINE>
-</FILE>
-
-<!-- event handler -->
-<FILE Name="/usr/local/emhttp/plugins/snap/event/stopped" Mode="0770">
-<INLINE>
-<![CDATA[
-#!/bin/bash
-/boot/config/plugins/snap/snap.sh -unmountAll 2>&1 >/dev/null &
 ]]>
 </INLINE>
 </FILE>

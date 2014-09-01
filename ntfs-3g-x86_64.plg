@@ -1,5 +1,17 @@
 <?xml version='1.0' standalone='yes'?>
-<PLUGIN>
+
+<!DOCTYPE PLUGIN [
+<!ENTITY name      "ntfs-3g">
+<!ENTITY author    "dlandon">
+<!ENTITY version   "3.1.13-x86_64">
+<!ENTITY category  "NTFS Write Support">
+<!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
+]>
+
+<PLUGIN  name="&name;"
+         author="&author;"
+         version="&version;"
+         category="&category;">
 
 <!--
 2013-10-19 - first release
@@ -8,26 +20,6 @@
 The plugin provides ntfs-3g support for unRAID systems.
 
 -->
-
-<FILE Name="/tmp/ntfs-prepare" Run="/bin/bash">
-<INLINE>
-# Wait until network is ready
-timer=30
-while [ $timer -gt 0 ]; do
-	gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
-	if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
-		break
-	fi
-	timer=$((timer-1))
-	sleep 1
-done
-if [ $timer -eq 0 ]; then
-	echo "No network communication !!!"
-fi
-# Remove this script
-rm -f /tmp/ntfs-prepare
-</INLINE>
-</FILE>
 
 <FILE Name="/boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.oregonstate.edu/slackware64-14.1/slackware64/a/ntfs-3g-2013.1.13-x86_64-1.txz</URL>
