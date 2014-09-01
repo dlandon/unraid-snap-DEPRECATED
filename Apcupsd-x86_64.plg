@@ -4,7 +4,7 @@
 <!ENTITY name      "APC UPS">
 <!ENTITY author    "seeDrs">
 <!ENTITY version   "2014.09.01">
-<!ENTITY category  "Other Settings">
+<!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
 
@@ -63,8 +63,8 @@ rm -f /tmp/apcupsd-prepare
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/packages/apcupsd-3.14.12-x86_64-4_SBo.tgz" Run="upgradepkg --install-new">
-<URL>https://dl.dropboxusercontent.com/u/35005524/apcupsd-3.14.12-x86_64-4_SBo.tgz</URL>
+<FILE Name="/boot/packages/apcupsd-3.14.12-x86_64-4.tgz" Run="upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/apcupsd-3.14.12-x86_64-4.tgz</URL>
 </FILE>
 
 <FILE Name="/boot/packages/powerdown-2.07-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
