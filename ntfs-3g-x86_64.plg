@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2013.01.13">
+<!ENTITY version   "2014.09.01">
 <!ENTITY category  "NTFS Write Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
@@ -25,6 +25,28 @@ The plugin provides ntfs-3g support for unRAID systems.
 <FILE Name="/boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.oregonstate.edu/slackware64-14.1/slackware64/a/ntfs-3g-2013.1.13-x86_64-1.txz</URL>
 <MD5>de646f44d881b6c4292e353b717792cd</MD5>
+</FILE>
+
+<!--
+create plugin README.md file
+-->
+<FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
+<INLINE>
+**NTFS-3G support**
+
+All this does is install the ntfs-3g package.
+</INLINE>
+</FILE>
+
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+rm /boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz
+removepkg ntfs-3g
+rm -r usr/local/emhttp/plugins/&name;
+</INLINE>
 </FILE>
 
 </PLUGIN>
