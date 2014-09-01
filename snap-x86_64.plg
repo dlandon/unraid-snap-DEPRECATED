@@ -41,26 +41,6 @@ All dependencies are installed as needed and everything is controlable from the 
 Filename: snap-x86_64.plg
 -->
 
-<FILE Name="/tmp/SnapPrepare" Run="/bin/bash">
-<INLINE>
-# Wait until network is ready
-timer=60
-while [ $timer -gt 0 ]; do
-	gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
-	if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
-		break
-	fi
-	timer=$((timer-1))
-	sleep 1
-done
-if [ $timer -eq 0 ]; then
-	echo "No network communication !!!"
-fi
-# Remove this script
-rm -f /tmp/SnapPrepare
-</INLINE>
-</FILE>
-
 <FILE Name="/boot/packages/inotify-tools-3.14-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackware.oregonstate.edu/slackware64-14.1/slackware64/a/inotify-tools-3.14-x86_64-1.txz</URL>
 <MD5>54d5c31bd9b6ed66b5535a5256ef094c</MD5>
@@ -73,10 +53,6 @@ rm -f /tmp/SnapPrepare
 if [ -d /tmp/snap ]
 then
 	rm -r /tmp/snap
-fi
-if [ -f /tmp/latestSnapVer ]
-then
-	rm /tmp/latestSnapVer 
 fi
 if [ -f /tmp/prepareForSnapInstall.sh ]
 then
@@ -131,22 +107,6 @@ else
 	#
 	echo "snap not installed yet." >>/tmp/snap.log
 
-	#
-	# Download the snap version file.
-	#
-	wget -t2 -q -O /tmp/latestSnapVer https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion-x86_64
-	sleep 2
-	checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion=' `
-	if [ -n "$checkit" ]
-	then
-		versionCode=`/usr/bin/grep -o 'Version=[0-9].[0-9][0-9]' /tmp/latestSnapVer|head -1`
-		latestVersion=`echo "$versionCode"|/usr/bin/cut -d'=' -f2`
-		echo "version is=$latestVersion" |tee -a /tmp/snap.log
-	else
-		echo "Error: Unable to download LatestSnapVersion information from GitHub." |tee -a  /tmp/snap.log
-		exit
-	fi
-	
 	if [ -d /tmp/snap ]
 	then
 		rm -r /tmp/snap
@@ -164,7 +124,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-$latestVersion.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-&version.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
@@ -353,43 +313,15 @@ snap_plgver()
 	case "$1" in
 	'local')
 		if [ -f /boot/config/plugins/snap-x86_64.plg ]; then
-			version=$(grep "<\!ENTITY plgver " /boot/config/plugins/snap-x86_64.plg | cut -d\" -f2)
+			version=$(grep "<\!ENTITY version " /boot/config/plugins/snap-x86_64.plg | cut -d\" -f2)
 		else
 			version=Unknown
 		fi
 	;;
 	'remote')
-		version=$(wget -q https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg -O - | grep "<\!ENTITY plgver " | cut -d\" -f2)
+		version=$(wget -q https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg -O - | grep "<\!ENTITY version " | cut -d\" -f2)
 		if [ "$version" == "" ]; then
 			version=Unknown
-		fi
-	;;
-	esac
-	echo -n "$version"
-}
-
-snap_appver()
-{
-	case "$1" in
-	'local')
-		version=`/boot/config/plugins/snap/snap.sh -v`
-	;;
-	'remote')
-		version=Unknown
-		if [ -f /tmp/latestSnapVer ]
-		then
-			rm /tmp/latestSnapVer 2>>/dev/null
-		fi
-		wget --cookies=off -t2 -q -O /tmp/latestSnapVer https://github.com/dlandon/unraid-snap/raw/master/LatestSnapVersion-x86_64
-		sleep 1
-		if [ -f /tmp/latestSnapVer ]
-		then
-			checkit=`cat /tmp/latestSnapVer| grep 'LatestSnapVersion=' `
-			if [ -n "$checkit" ]
-			then
-				versionCode=`/usr/bin/grep -o 'Version=[0-9].[0-9][0-9]' /tmp/latestSnapVer|head -1`
-				version=`echo "$versionCode"|/usr/bin/cut -d'=' -f2`
-			fi
 		fi
 	;;
 	esac
@@ -405,7 +337,7 @@ snap_getver()
 				snap_plgver $2
 			;;
 			'app')
-				snap_appver $2
+				snap_plgver $2
 			;;
 		esac
 	else
@@ -452,6 +384,44 @@ Version="5.28"
 Author="Queeg"
 Type="php"
 Title="SNAP"
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/snap/README.md">
+<INLINE>
+<![CDATA[
+**SNAP**
+
+SNAP allows mounting and sharing non-array drives.
+]]>
+</INLINE>
+</FILE>
+<FILE Name="/usr/local/emhttp/plugins/snap/license">
+<INLINE>
+<![CDATA[
+Copyright (C) 2010-2014, Dave Lewis or Queegtech.com
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, without modification,
+are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Any redistribution or use is done solely for personal benefit and not for any
+   commercial purpose or for monetary gain.  Companies may install and use on
+   servers they own.  Commercial users, please notify owner within 30 days of installation.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+
+You should have received a copy of the GNU General Public License
+along with SNAP.  If not, see <http://www.gnu.org/licenses/>.
+
+This Plugin installs SNAP for UnRaid.
+All dependencies are installed as needed and everything is controlable from the webgui.
 ]]>
 </INLINE>
 </FILE>
