@@ -32,7 +32,7 @@ SNAP will install.
 
 unRAID v6
 =========
-wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg
+wget https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg
 
 Reboot your server
 
@@ -70,7 +70,7 @@ unRAID v6
 =========
 cd /boot/config/plugins
 
-wget --no-check-certificate https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg
+wget https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg
 
 Reboot your server.
 
@@ -119,3 +119,5 @@ Version 5.25 - Fixed a hot plug issue with some devices.
 Version 5.26 - SNAP will change themes (white/black) when working with Dynamix.
 
 Version 5.27 - Modified style sheet to more closely match Dynamix black theme colors.
+
+Version 5.28 - Depricated unRAID v5 at version 5.27.  V5 will no longer be updated.  Starting with 5.28, V6 will be the only unRAID version supported.

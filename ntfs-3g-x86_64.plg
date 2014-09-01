@@ -11,7 +11,8 @@
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
-         category="&category;">
+         category="&category;"
+         pluginURL="&pluginURL;">
 
 <!--
 2013-10-19 - first release

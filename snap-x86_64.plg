@@ -11,12 +11,8 @@
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
-         category="&category;">
-
-<!DOCTYPE PLUGIN [
-<!ENTITY plugin "SNAP">
-<!ENTITY plgver "2.2">
-]>
+         category="&category;"
+         pluginURL="&pluginURL;">
 
 <!--
 Copyright (C) 2010-2014, Dave Lewis or Queegtech.com
