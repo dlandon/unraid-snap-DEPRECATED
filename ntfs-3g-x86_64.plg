@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "3.1.13-x86_64">
+<!ENTITY version   "3.1.13">
 <!ENTITY category  "NTFS Write Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
