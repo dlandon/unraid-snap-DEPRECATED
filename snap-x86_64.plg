@@ -46,7 +46,7 @@ Filename: snap-x86_64.plg
 <MD5>54d5c31bd9b6ed66b5535a5256ef094c</MD5>
 </FILE>
 
-<FILE Name="/tmp/preSnapInstallCleanup.sh"  Run="/bin/bash">
+<FILE Name="/tmp/preSnapInstallCleanup.sh" Run="/bin/bash">
 <INLINE>
 <![CDATA[
 #!/bin/bash
@@ -70,7 +70,7 @@ fi
 </INLINE>
 </FILE>
 
-<FILE Name="/tmp/prepareForSnapInstall.sh"  Run="/bin/bash">
+<FILE Name="/tmp/prepareForSnapInstall.sh" Run="/bin/bash">
 <INLINE>
 <![CDATA[
 #!/bin/bash
@@ -201,29 +201,6 @@ then
 	sed -i -e 's/<script src="\/plugins\/snap\/jquery.qtip-1.0.0-rc3.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
 fi
 ]]>
-
-</INLINE>
-</FILE>
-<FILE Name="/tmp/SnapInstall.sh"  Run="/bin/bash">
-<INLINE>
-<![CDATA[
-#!/bin/bash
-if [ -f /tmp/preSnapInstallCleanup.sh ]
-then
-	rm /tmp/preSnapInstallCleanup.sh
-fi
-if [ -f /tmp/prepareForSnapInstall.sh ]
-then
-	rm /tmp/prepareForSnapInstall.sh 
-fi
-
-#
-# Start SNAP and mount any SNAP (usb) drives found.
-#
-/boot/config/plugins/snap/snap.sh -b &
-
-rm /tmp/SnapInstall.sh
-]]>
 </INLINE>
 </FILE>
 
@@ -231,7 +208,7 @@ rm /tmp/SnapInstall.sh
 <INLINE>
 <![CDATA[
 #!/bin/bash
-# start|stop|restart|enable|disable|install|buttonstart|storagesize|datacheck|updateplg|updateapp|getver snap.
+# start|stop|restart|getver snap.
 
 snap_start()
 {
@@ -255,57 +232,6 @@ snap_restart()
 	snap_stop
 	snap_start
 	echo "... Snap restarted"
-}
-
-snap_updateplg()
-{
-	if [ -f /boot/config/plugins/snap-x86_64.plg ];
-	then
-		echo "Downloading plugin..."
-		wget -t2 -q -O /tmp/snap-x86_64.plg https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg
-		if [ ! -f /tmp/snap-x86_64.plg ];
-		then
-			echo "Download failed, update aborted!"
-			sleep 2
-		else
-			echo "...OK"
-			sleep 1
-			echo  "Upgrading plugin..."
-			sleep 1
-			mv -f /boot/config/plugins/snap-x86_64.plg /boot/config/plugins/snap/snap-x86_64.plg.sav 2>/dev/null
-			mv -f /tmp/snap-x86_64.plg /boot/config/plugins/snap-x86_64.plg 2>/dev/null
-			/usr/local/sbin/installplg /boot/config/plugins/snap-x86_64.plg 2>/dev/null
-			echo "...OK"
-			sleep 1
-		fi
-	fi
-}
-
-snap_updateapp()
-{
-	result=`/boot/config/plugins/snap/snap.sh -checkForUpdate`
-	if [ "$result" == "yes" ]
-	then
-		echo "Downloading SNAP..."
-		result=`/boot/config/plugins/snap/snap.sh -downloadUpdate`
-		if [ "$result" == "yes" ]
-		then
-			echo "Updating SNAP..."
-			result=`/boot/config/plugins/snap/snap.sh -installUpdate-step1`
-			if [ "$result" == "yes" ]
-			then
-				/boot/config/plugins/snap/snap.sh -installUpdate-step2
-				/usr/local/sbin/installplg /boot/config/plugins/snap-x86_64.plg 2>/dev/null
-				echo "...OK"
-			else
-				echo "SNAP could not update..."
-			fi
-		else
-			echo "Download failed, update aborted!"
-		fi
-	else
-		echo "No update available!"
-	fi
 }
 
 snap_plgver()
@@ -355,17 +281,11 @@ case "$1" in
 	'restart')
 		snap_restart
 	;;
-	'updateplg')
-		snap_updateplg
-	;;
-	'updateapp')
-		snap_updateapp
-	;;
 	'getver')
 		snap_getver $2 $3
 	;;  
 	*)
-	echo "usage $0 start|stop|restart|updateplg|updateapp|getver"
+	echo "usage $0 start|stop|restart|getver"
 esac
 ]]>
 </INLINE>
@@ -375,6 +295,9 @@ esac
 <URL>-q https://github.com/dlandon/unraid-snap/raw/master/snap.png</URL>
 </FILE>
 
+<!--
+create plugin page file
+-->
 <FILE Name="/usr/local/emhttp/plugins/snap/snap.page">
 <INLINE>
 <![CDATA[
@@ -388,6 +311,9 @@ Title="SNAP"
 </INLINE>
 </FILE>
 
+<!--
+create plugin README.md file
+-->
 <FILE Name="/usr/local/emhttp/plugins/snap/README.md">
 <INLINE>
 <![CDATA[
@@ -398,6 +324,9 @@ SNAP allows mounting and sharing non-array drives.
 </INLINE>
 </FILE>
 
+<!--
+create plugin license file
+-->
 <FILE Name="/usr/local/emhttp/plugins/snap/license">
 <INLINE>
 <![CDATA[
@@ -432,9 +361,37 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
+# Stop snap.
+/etc/rc.d/rc.snap stop
+
 rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
 removepkg inotify-tools
 rm -r usr/local/emhttp/plugins/snap
 </INLINE>
 </FILE>
+
+<FILE Name="/tmp/SnapInstall.sh" Run="/bin/bash">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+if [ -f /tmp/preSnapInstallCleanup.sh ]
+then
+	rm /tmp/preSnapInstallCleanup.sh
+fi
+if [ -f /tmp/prepareForSnapInstall.sh ]
+then
+	rm /tmp/prepareForSnapInstall.sh 
+fi
+
+#
+# Start SNAP and mount any SNAP (usb) drives found.
+# dfl
+/etc/rc.d/rc.snap start &
+
+echo "Snap installation complete..."
+rm /tmp/SnapInstall.sh
+]]>
+</INLINE>
+</FILE>
+
 </PLUGIN>

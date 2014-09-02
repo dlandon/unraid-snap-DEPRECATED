@@ -98,18 +98,18 @@ SHOWFULLSTATUS="NO"
 <![CDATA[
 #Remove currently installed plugin files
 [ -f /boot/config/plugins/apcupsd/apply ] && rm /boot/config/plugins/apcupsd/apply
-[ -f /usr/local/emhttp/plugins/apcups/apcupsd.php ] && rm -rf /usr/local/emhttp/plugins/apcups
+[ -f /usr/local/emhttp/plugins/apcupsd/apcups.php ] && rm -rf /usr/local/emhttp/apcups/apcups
 
 rm /tmp/apcupsd-upgrade
 ]]>
 </INLINE>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/apcups/apcups.png">
+<FILE Name="/usr/local/emhttp/plugins/&name;/apcups.png">
 <LOCAL>/boot/config/plugins/apcupsd/apcupsd.png</LOCAL>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/apcups/apcupsd.page">
+<FILE Name="/usr/local/emhttp/plugins/&name;/apcupsd.page">
 <INLINE>
 <![CDATA[
 Menu="OtherSettings"
@@ -122,7 +122,7 @@ Title="APC UPS"
 </INLINE>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/apcups/apcupsd.php">
+<FILE Name="/usr/local/emhttp/plugins/&name;/apcupsd.php">
 <INLINE>
 <![CDATA[
 <?PHP
@@ -415,7 +415,7 @@ document.apcupsd_settings.form.SHOWFULLSTATUS.value = document.apcupsd_settings.
 </INLINE>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/apcups/apcupsdctl.php">
+<FILE Name="/usr/local/emhttp/plugins/&name;/apcupsdctl.php">
 <INLINE>
 <![CDATA[
 <?PHP
@@ -616,7 +616,7 @@ document.apcupsd_settings.form.SHOWFULLSTATUS.value = document.apcupsd_settings.
 <!--
 create plugin README.md file
 -->
-<FILE Name="/usr/local/emhttp/plugins/apcups/README.md">
+<FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
 **APC UPS support**
 
@@ -633,7 +633,7 @@ rm /boot/packages/apcupsd-3.14.12-x86_64-4.tgz
 rm /boot/packages/powerdown-2.07-noarch-unRAID.tgz
 removepkg apcupsd
 removepkg powerdown
-rm -r usr/local/emhttp/plugins/apcups
+rm -r usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
