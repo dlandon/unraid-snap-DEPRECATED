@@ -2,8 +2,8 @@
 
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
-<!ENTITY author    "Queeg">
-<!ENTITY version   "2014.09.01">
+<!ENTITY author    "Queeg/dlandon">
+<!ENTITY version   "2014.09.02">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -383,7 +383,7 @@ Icon="snap.png"
 Version="5.28"
 Author="Queeg"
 Type="php"
-Title="snap"
+Title="SNAP"
 ]]>
 </INLINE>
 </FILE>
