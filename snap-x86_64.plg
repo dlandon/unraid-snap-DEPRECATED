@@ -1,9 +1,9 @@
 <?xml version='1.0' standalone='yes'?>
 
 <!DOCTYPE PLUGIN [
-<!ENTITY name      "SNAP">
+<!ENTITY name      "snap">
 <!ENTITY author    "Queeg">
-<!ENTITY version   "5.28">
+<!ENTITY version   "2014.09.01">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -383,7 +383,7 @@ Icon="snap.png"
 Version="5.28"
 Author="Queeg"
 Type="php"
-Title="SNAP"
+Title="snap"
 ]]>
 </INLINE>
 </FILE>
@@ -391,12 +391,13 @@ Title="SNAP"
 <FILE Name="/usr/local/emhttp/plugins/snap/README.md">
 <INLINE>
 <![CDATA[
-**SNAP**
+**SNAP non-array drive support**
 
 SNAP allows mounting and sharing non-array drives.
 ]]>
 </INLINE>
 </FILE>
+
 <FILE Name="/usr/local/emhttp/plugins/snap/license">
 <INLINE>
 <![CDATA[
@@ -426,4 +427,14 @@ All dependencies are installed as needed and everything is controlable from the 
 </INLINE>
 </FILE>
 
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
+removepkg inotify-tools
+rm -r usr/local/emhttp/plugins/snap
+</INLINE>
+</FILE>
 </PLUGIN>
