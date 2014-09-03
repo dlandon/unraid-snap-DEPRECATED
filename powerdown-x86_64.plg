@@ -1,0 +1,70 @@
+<?xml version='1.0' standalone='yes'?>
+
+<!DOCTYPE PLUGIN [
+<!ENTITY name      "powerdown">
+<!ENTITY author    "WeeboTech/dlandon">
+<!ENTITY version   "2014.09.03">
+<!ENTITY category  "Clean Powerdown Support">
+<!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
+]>
+
+<PLUGIN  name="&name;"
+         author="&author;"
+         version="&version;"
+         category="&category;"
+         pluginURL="&pluginURL;">
+
+
+<!--
+
+The plugin provides clean powerdown for unRAID systems.
+
+-->
+
+<FILE Name="/tmp/powerdown-prepare" Run="/bin/bash">
+<INLINE>
+# Wait until network is ready
+timer=60
+while [ $timer -gt 0 ]; do
+	gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
+	if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
+		break
+	fi
+	timer=$((timer-1))
+	sleep 1
+done
+if [ $timer -eq 0 ]; then
+	echo "No network communication !!!"
+fi
+# Remove this script
+rm -f /tmp/powerdown-prepare
+</INLINE>
+</FILE>
+
+<FILE Name="/boot/packages/powerdown-2.07-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.07-noarch-unRAID.tgz</URL>
+</FILE>
+
+<!--
+create plugin README.md file
+-->
+<FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
+<INLINE>
+**Powerdown Package**
+
+This installs the powerdown package for clean shutdown of unRAID.  Hooks are inserted in the Linux scripts for shutdown, and rebooting so unRAID will be shut down cleanly.  This prevents a parity check the next time the system is started.
+</INLINE>
+</FILE>
+
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+rm /boot/packages/powerdown-2.07-noarch-unRAID.tgz
+removepkg powerdown
+rm -r usr/local/emhttp/plugins/&name;
+</INLINE>
+</FILE>
+
+</PLUGIN>
