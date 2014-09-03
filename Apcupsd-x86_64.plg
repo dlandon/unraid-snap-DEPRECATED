@@ -67,8 +67,11 @@ rm -f /tmp/apcupsd-prepare
 <URL>https://github.com/dlandon/unraid-snap/raw/master/apcupsd-3.14.12-x86_64-4.tgz</URL>
 </FILE>
 
-<FILE Name="/boot/packages/powerdown-2.07-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.07-noarch-unRAID.tgz</URL>
+<!--
+Download the powerdown plugin.
+-->
+<FILE Name="/boot/config/plugins/powerdown-x86_64.plg">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg</URL>
 </FILE>
 
 <FILE Name="/boot/config/plugins/apcupsd/apcupsd.png">
@@ -630,9 +633,7 @@ The 'remove' script.
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 rm /boot/packages/apcupsd-3.14.12-x86_64-4.tgz
-rm /boot/packages/powerdown-2.07-noarch-unRAID.tgz
 removepkg apcupsd
-removepkg powerdown
 rm -r usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
@@ -640,7 +641,7 @@ rm -r usr/local/emhttp/plugins/&name;
 <FILE Name="/tmp/apcupsd-install" Run="/bin/bash">
 <INLINE>
 <![CDATA[
-#Finish APCUPSD Install
+# Finish APCUPSD Install
 echo "/sbin/powerdown" >/etc/apcupsd/doshutdown
 echo "exit 99" >>/etc/apcupsd/doshutdown
 chmod 755 /etc/apcupsd/doshutdown
@@ -652,6 +653,12 @@ sed -i -e "s/\$0 stop/\$0 stop\n       sleep 3/" /etc/rc.d/rc.apcupsd
 
 #Start APCUPSD if enabled
 php /usr/local/emhttp/plugins/apcups/apcupsdctl.php "autostart"
+
+# Install powerdown plugin
+if [ -f /boot/config/plugins/powerdown-x86_64.plg ]
+then
+  /usr/local/sbin/installplg /boot/config/plugins/powerdown-x86_64.plg
+fi
 
 rm /tmp/apcupsd-install
 ]]>

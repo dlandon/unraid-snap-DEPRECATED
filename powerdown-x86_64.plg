@@ -50,7 +50,7 @@ create plugin README.md file
 -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
-**Powerdown Package**
+**Powerdown Package (2.07)**
 
 This installs the powerdown package for clean shutdown of unRAID.  Hooks are inserted in the Linux scripts for shutdown, and rebooting so unRAID will be shut down cleanly.  This prevents a parity check the next time the system is started.
 </INLINE>
