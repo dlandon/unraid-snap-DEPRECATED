@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.03">
+<!ENTITY version   "2014.09.04">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -124,7 +124,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-5.29.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-6.00.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
@@ -299,7 +299,7 @@ create plugin page file
 <![CDATA[
 Menu="OtherSettings"
 Icon="snap.png"
-Version="5.28"
+Version="6.00"
 Author="Queeg"
 Type="php"
 Title="SNAP"
@@ -316,7 +316,7 @@ create plugin README.md file
 **SNAP non-array drive mount and share**
 
 SNAP allows mounting and sharing non-array drives.  Non array drives are mounted and shared through menu selections on the SNAP page of unRAID, or you can set up scripts to run when a USB drive is plugged in.
-The current formats supported are: ntfs, vfat, msdos, ext2, ext3, and hfsplus.
+The current formats supported are: r/w - ntfs (with ntfs-3g driver), reiserfs, btrfs, xfs, ext4 (with discard); ro - ntfs (without ntfs-3g driver), vfat, msdos, ext2, ext3, and hfsplus.
 ]]>
 </INLINE>
 </FILE>
@@ -363,7 +363,8 @@ The 'remove' script.
 
 rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
 removepkg inotify-tools
-rm -r usr/local/emhttp/plugins/snap
+rm -r /usr/local/emhttp/plugins/snap
+rm -r /boot/config/plugins/snap
 </INLINE>
 </FILE>
 
