@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.02">
+<!ENTITY version   "2014.09.03">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -291,10 +291,6 @@ esac
 </INLINE>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/snap/snap.png">
-<URL>-q https://github.com/dlandon/unraid-snap/raw/master/snap.png</URL>
-</FILE>
-
 <!--
 create plugin page file
 -->
@@ -317,9 +313,10 @@ create plugin README.md file
 <FILE Name="/usr/local/emhttp/plugins/snap/README.md">
 <INLINE>
 <![CDATA[
-**SNAP non-array drive support**
+**SNAP non-array drive mount and share**
 
-SNAP allows mounting and sharing non-array drives.
+SNAP allows mounting and sharing non-array drives.  Non array drives are mounted and shared through menu selections on the SNAP page of unRAID, or you can set up scripts to run when a USB drive is plugged in.
+The current formats supported are: ntfs, vfat, msdos, ext2, ext3, and hfsplus.
 ]]>
 </INLINE>
 </FILE>
