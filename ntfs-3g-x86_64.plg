@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.01">
+<!ENTITY version   "2014.09.04">
 <!ENTITY category  "NTFS Write Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
@@ -32,9 +32,9 @@ create plugin README.md file
 -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
-**NTFS-3G support**
+**NTFS-3G Package**
 
-All this does is install the ntfs-3g package.
+The ntfs-3g driver package is needed for writing on NTFS formated disks.  The built in NTFS driver is read only.
 </INLINE>
 </FILE>
 
@@ -45,7 +45,7 @@ The 'remove' script.
 <INLINE>
 rm /boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz
 removepkg ntfs-3g
-rm -r usr/local/emhttp/plugins/&name;
+rm -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
