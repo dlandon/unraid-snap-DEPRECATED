@@ -124,7 +124,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-5.28.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-5.29.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
