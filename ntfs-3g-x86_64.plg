@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.04">
+<!ENTITY version   "2014.09.04-1">
 <!ENTITY category  "NTFS Write Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
@@ -27,6 +27,14 @@ The plugin provides ntfs-3g support for unRAID systems.
 <MD5>de646f44d881b6c4292e353b717792cd</MD5>
 </FILE>
 
+<FILE Name="/boot/config/plugins/ntfs-3g/ntfs-3g.png">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g.png</URL>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/ntfs-3g/ntfs-3g.png">
+<LOCAL>/boot/config/plugins/ntfs-3g/ntfs-3g.png</LOCAL>
+</FILE>
+
 <!--
 create plugin README.md file
 -->
@@ -45,7 +53,8 @@ The 'remove' script.
 <INLINE>
 rm /boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz
 removepkg ntfs-3g
-rm -r /usr/local/emhttp/plugins/&name;
+rm -r /usr/local/emhttp/plugins/ntfs-3g
+rm -r /boot/config/plugins/ntfs-3g
 </INLINE>
 </FILE>
 
