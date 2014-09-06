@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.05">
+<!ENTITY version   "2014.09.06">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -66,6 +66,9 @@ fi
 </INLINE>
 </FILE>
 
+<!--
+Prepare for snap install.
+-->
 <FILE Name="/tmp/prepareForSnapInstall.sh" Run="/bin/bash">
 <INLINE>
 <![CDATA[
@@ -200,6 +203,9 @@ fi
 </INLINE>
 </FILE>
 
+<!--
+rc.snap file.
+-->
 <FILE Name="/etc/rc.d/rc.snap" Mode="0770">
 <INLINE>
 <![CDATA[
@@ -208,7 +214,6 @@ fi
 
 snap_start()
 {
-	/boot/config/plugins/snap/snap.sh -enable
 	/boot/config/plugins/snap/snap.sh -b
 	echo "... Snap started"
 	sleep 1
@@ -288,7 +293,7 @@ esac
 </FILE>
 
 <!--
-create plugin page file
+Create plugin page file
 -->
 <FILE Name="/usr/local/emhttp/plugins/snap/snap.page">
 <INLINE>
@@ -313,11 +318,14 @@ The 'remove' script.
 
 rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
 removepkg inotify-tools
-rm -r usr/local/emhttp/plugins/&name;
+rm -r /usr/local/emhttp/plugins/&name;
 rm -r /boot/config/plugins/&name;
 </INLINE>
 </FILE>
 
+<!--
+Snap install.
+-->
 <FILE Name="/tmp/SnapInstall.sh" Run="/bin/bash">
 <INLINE>
 <![CDATA[
@@ -333,7 +341,7 @@ fi
 
 #
 # Start SNAP and mount any SNAP (usb) drives found.
-# dfl
+#
 /etc/rc.d/rc.snap start
 
 echo "Snap installation complete..."
