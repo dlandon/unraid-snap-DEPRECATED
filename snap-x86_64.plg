@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.04">
+<!ENTITY version   "2014.09.05">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -292,68 +292,6 @@ esac
 </FILE>
 
 <!--
-create plugin page file
--->
-<FILE Name="/usr/local/emhttp/plugins/snap/snap.page">
-<INLINE>
-<![CDATA[
-Menu="OtherSettings"
-Icon="snap.png"
-Version="6.00"
-Author="Queeg"
-Type="php"
-Title="SNAP"
-]]>
-</INLINE>
-</FILE>
-
-<!--
-create plugin README.md file
--->
-<FILE Name="/usr/local/emhttp/plugins/snap/README.md">
-<INLINE>
-<![CDATA[
-**SNAP non-array drive mount and share**
-
-SNAP allows mounting and sharing non-array drives.  Non array drives are mounted and shared through menu selections on the SNAP page of unRAID, or you can set up scripts to run when a USB drive is plugged in.
-The current formats supported are: r/w - ntfs (with ntfs-3g driver), reiserfs, btrfs, xfs, ext4 (with discard); ro - ntfs (without ntfs-3g driver), vfat, msdos, ext2, ext3, and hfsplus.
-]]>
-</INLINE>
-</FILE>
-
-<!--
-create plugin license file
--->
-<FILE Name="/usr/local/emhttp/plugins/snap/license">
-<INLINE>
-<![CDATA[
-Copyright (C) 2010-2014, Dave Lewis or Queegtech.com
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, without modification,
-are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
- * Any redistribution or use is done solely for personal benefit and not for any
-   commercial purpose or for monetary gain.  Companies may install and use on
-   servers they own.  Commercial users, please notify owner within 30 days of installation.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-
-You should have received a copy of the GNU General Public License
-along with SNAP.  If not, see <http://www.gnu.org/licenses/>.
-
-This Plugin installs SNAP for UnRaid.
-All dependencies are installed as needed and everything is controlable from the webgui.
-]]>
-</INLINE>
-</FILE>
-
-<!--
 The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
@@ -363,11 +301,14 @@ The 'remove' script.
 
 rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
 removepkg inotify-tools
-rm -r /usr/local/emhttp/plugins/snap
-rm -r /boot/config/plugins/snap
+rm -r /usr/local/emhttp/plugins/&name;
+rm -r /boot/config/plugins/&name;
 </INLINE>
 </FILE>
 
+<!--
+Installation script.
+-->
 <FILE Name="/tmp/SnapInstall.sh" Run="/bin/bash">
 <INLINE>
 <![CDATA[
@@ -384,7 +325,7 @@ fi
 #
 # Start SNAP and mount any SNAP (usb) drives found.
 # dfl
-/etc/rc.d/rc.snap start &
+/etc/rc.d/rc.snap start
 
 echo "Snap installation complete..."
 rm /tmp/SnapInstall.sh

@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcups">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.04">
+<!ENTITY version   "2014.09.05">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -43,26 +43,9 @@ The plugin provides APCUPSD support for unRAID V6.
 
 -->
 
-<FILE Name="/tmp/apcupsd-prepare" Run="/bin/bash">
-<INLINE>
-# Wait until network is ready
-timer=60
-while [ $timer -gt 0 ]; do
-	gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
-	if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
-		break
-	fi
-	timer=$((timer-1))
-	sleep 1
-done
-if [ $timer -eq 0 ]; then
-	echo "No network communication !!!"
-fi
-# Remove this script
-rm -f /tmp/apcupsd-prepare
-</INLINE>
-</FILE>
-
+<!--
+Get the apcupsd package.
+-->
 <FILE Name="/boot/packages/apcupsd-3.14.12-x86_64-4.tgz" Run="upgradepkg --install-new">
 <URL>https://github.com/dlandon/unraid-snap/raw/master/apcupsd-3.14.12-x86_64-4.tgz</URL>
 </FILE>
@@ -78,6 +61,9 @@ Download the powerdown plugin.
 <URL>https://github.com/dlandon/unraid-snap/raw/master/Apcupsd.png</URL>
 </FILE>
 
+<!--
+Create the configuration file.
+-->
 <FILE Name="/boot/config/plugins/apcupsd/apcupsd.cfg">
 <INLINE>
 <![CDATA[
@@ -95,19 +81,9 @@ SHOWFULLSTATUS="NO"
 </INLINE>
 </FILE>
 
-
-<FILE Name="/tmp/apcupsd-upgrade" Run="/bin/bash">
-<INLINE>
-<![CDATA[
-#Remove currently installed plugin files
-[ -f /boot/config/plugins/apcupsd/apply ] && rm /boot/config/plugins/apcupsd/apply
-[ -f /usr/local/emhttp/plugins/apcupsd/apcups.php ] && rm -rf /usr/local/emhttp/apcups/apcups
-
-rm /tmp/apcupsd-upgrade
-]]>
-</INLINE>
-</FILE>
-
+<!--
+Icon.
+-->
 <FILE Name="/usr/local/emhttp/plugins/&name;/apcups.png">
 <LOCAL>/boot/config/plugins/apcupsd/apcupsd.png</LOCAL>
 </FILE>
@@ -125,6 +101,9 @@ Title="APC UPS"
 </INLINE>
 </FILE>
 
+<!--
+apcupsd.php.
+-->
 <FILE Name="/usr/local/emhttp/plugins/&name;/apcupsd.php">
 <INLINE>
 <![CDATA[
@@ -418,6 +397,9 @@ document.apcupsd_settings.form.SHOWFULLSTATUS.value = document.apcupsd_settings.
 </INLINE>
 </FILE>
 
+<!--
+apcupsdctl.php
+-->
 <FILE Name="/usr/local/emhttp/plugins/&name;/apcupsdctl.php">
 <INLINE>
 <![CDATA[
@@ -634,11 +616,15 @@ The 'remove' script.
 <INLINE>
 rm /boot/packages/apcupsd-3.14.12-x86_64-4.tgz
 removepkg apcupsd
-rm -r /usr/local/emhttp/plugins/apcupsd
+rm -r /usr/local/emhttp/plugins/&name;
 rm -r /boot/config/plugins/apcupsd
+rm -r /var/log/plugins/apcupsd
 </INLINE>
 </FILE>
 
+<!--
+Install script.
+-->
 <FILE Name="/tmp/apcupsd-install" Run="/bin/bash">
 <INLINE>
 <![CDATA[
@@ -662,14 +648,6 @@ then
 fi
 
 rm /tmp/apcupsd-install
-]]>
-</INLINE>
-</FILE>
-
-<FILE Name="/var/log/plugins/apcupsd">
-<INLINE>
-<![CDATA[
-
 ]]>
 </INLINE>
 </FILE>
