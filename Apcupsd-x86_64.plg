@@ -138,6 +138,31 @@ apcupsd.php.
       $timeleft = substr($apcaccessoutput, $timeleftstartpos, $timeleftendpos-$timeleftstartpos);
       $timeleftint = preg_replace('/[^0-9\.]/', '', $timeleft);
       $timeleftcolour = (round($timeleft) <= 5 ? 'red' : 'green');
+
+      //loadpct
+      $loadpctstartpos = strpos($apcaccessoutput, "LOADPCT  :") +11;
+      $loadpctendpos = strpos($apcaccessoutput, "\n", $loadpctstartpos);
+      $loadpct = substr($apcaccessoutput, $loadpctstartpos, $loadpctendpos-$loadpctstartpos);
+      $loadpctint = preg_replace('/[^0-9\.]/', '', $loadpct);
+
+      //nompower
+      $nompowerstartpos = strpos($apcaccessoutput, "NOMPOWER :") +11;
+      $nompowerendpos = strpos($apcaccessoutput, "\n", $nompowerstartpos);
+      $nompower = substr($apcaccessoutput, $nompowerstartpos, $nompowerendpos-$nompowerstartpos);
+      $nompowerint = preg_replace('/[^0-9\.]/', '', $nompower);
+      
+      //load
+      if ($nompowerstartpos != "11")
+      {
+       $load=($loadpctint/100)*$nompowerint;
+       $loadcolour='green';
+      }
+      else 
+      {
+       $load="N/A";
+       $loadcolour='red';
+      }
+      $load .= " Watts";
      }     
   }
   
@@ -199,6 +224,12 @@ apcupsd.php.
           </td>
           <td>
              <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Time Left: </span><span class="<?=$timeleftcolour;?>"><?=$timeleft;?></span><? endif; ?>
+          </td>
+          <td>
+             <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Load: </span><span class="<?=$loadcolour;?>"><?=$load;?></span><? endif; ?>
+          </td>
+          <td>
+             <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Load %: </span><span class="<?=$loadcolour;?>"><?=$loadpct;?></span><? endif; ?>
           </td>
          </tr>
        </table>
