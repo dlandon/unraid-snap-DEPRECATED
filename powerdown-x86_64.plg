@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "powerdown">
 <!ENTITY author    "WeeboTech/dlandon">
-<!ENTITY version   "2014.09.05">
+<!ENTITY version   "2014.09.06">
 <!ENTITY category  "Clean Powerdown Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
 ]>
@@ -49,8 +49,8 @@ The 'remove' script.
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 rm /boot/packages/powerdown-2.07-noarch-unRAID.tgz
-removepkg /&name;
-rm -r usr/local/emhttp/plugins/&name;
+removepkg powerdown
+rm -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
