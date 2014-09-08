@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcups">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.06">
+<!ENTITY version   "2014.09.08">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -39,6 +39,8 @@
 
 2014-08-31 - Updated to apcupsd 3.10.12.
 
+2014-09-05 - Updated to acpupsd 3.14.12.  Updated plugin for V6 and added several mods by dmacias.
+
 The plugin provides APCUPSD support for unRAID V6.
 
 -->
@@ -62,7 +64,7 @@ Download the powerdown plugin.
 </FILE>
 
 <!--
-Create the configuration file.
+Create the default configuration file.
 -->
 <FILE Name="/boot/config/plugins/apcupsd/apcupsd.cfg">
 <INLINE>
@@ -84,11 +86,11 @@ SHOWFULLSTATUS="NO"
 <!--
 Icon.
 -->
-<FILE Name="/usr/local/emhttp/plugins/&name;/apcups.png">
+<FILE Name="/usr/local/emhttp/plugins/&name;/&name;.png">
 <LOCAL>/boot/config/plugins/apcupsd/apcupsd.png</LOCAL>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/&name;/apcupsd.page">
+<FILE Name="/usr/local/emhttp/plugins/&name;/Apcups.page">
 <INLINE>
 <![CDATA[
 Menu="OtherSettings"
@@ -102,9 +104,9 @@ Title="APC UPS"
 </FILE>
 
 <!--
-apcupsd.php.
+Apcups.php.
 -->
-<FILE Name="/usr/local/emhttp/plugins/&name;/apcupsd.php">
+<FILE Name="/usr/local/emhttp/plugins/&name;/Apcups.php">
 <INLINE>
 <![CDATA[
 <?PHP
@@ -435,7 +437,7 @@ apcupsdctl.php
 <INLINE>
 <![CDATA[
 <?PHP
-  $logfile = "/var/log/plugins/apcupsd";
+  $logfile = "/var/log/apcupsd";
   $configfile = "/boot/config/plugins/apcupsd/apcupsd.cfg";
   $apcupsd_installing = file_exists( "/tmp/apcupsd-install") ? "yes" : "no";
   date_default_timezone_set(substr(readlink("/etc/localtime-copied-from"), 20));
@@ -630,7 +632,7 @@ apcupsdctl.php
 </FILE>
 
 <!--
-create plugin README.md file
+Create plugin README.md file
 -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
@@ -649,14 +651,14 @@ rm /boot/packages/apcupsd-3.14.12-x86_64-4.tgz
 removepkg apcupsd
 rm -r /usr/local/emhttp/plugins/&name;
 rm -r /boot/config/plugins/apcupsd
-rm -r /var/log/plugins/apcupsd
+rm -r /var/log/apcupsd
 </INLINE>
 </FILE>
 
 <!--
 Install script.
 -->
-<FILE Name="/tmp/apcupsd-install" Run="/bin/bash">
+<FILE Run="/bin/bash">
 <INLINE>
 <![CDATA[
 # Finish APCUPSD Install
@@ -677,8 +679,6 @@ if [ -f /boot/config/plugins/powerdown-x86_64.plg ]
 then
   /usr/local/sbin/installplg /boot/config/plugins/powerdown-x86_64.plg
 fi
-
-rm /tmp/apcupsd-install
 ]]>
 </INLINE>
 </FILE>
