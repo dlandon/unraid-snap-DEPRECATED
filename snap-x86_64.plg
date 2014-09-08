@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.07">
+<!ENTITY version   "2014.09.08">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -123,7 +123,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-6.02.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-6.03.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
@@ -310,7 +310,7 @@ rm -r /boot/config/plugins/&name;
 <!--
 Snap start up script.
 -->
-<FILE Name="/tmp/start_snap.sh">
+<FILE Name="/tmp/start_snap.sh" Run="/bin/bash">
 <INLINE>
 <![CDATA[
 #!/bin/bash
@@ -324,7 +324,7 @@ rm /tmp/start_snap.sh
 <!--
 Snap install.
 -->
-<FILE Name="/tmp/SnapInstall.sh" Run="/bin/bash">
+<FILE Run="/bin/bash">
 <INLINE>
 <![CDATA[
 #!/bin/bash
@@ -344,7 +344,6 @@ echo "Starting Snap..."
 at -f/tmp/start_snap.sh now
 
 echo "Snap installation complete..."
-rm /tmp/SnapInstall.sh
 ]]>
 </INLINE>
 </FILE>
