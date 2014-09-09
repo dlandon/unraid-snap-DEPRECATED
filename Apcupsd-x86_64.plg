@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcups">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.08">
+<!ENTITY version   "2014.09.08-1">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -658,7 +658,7 @@ rm -r /var/log/apcupsd
 <!--
 Install script.
 -->
-<FILE Run="/bin/bash">
+<FILE Name="/tmp/apcupsd-install" Run="/bin/bash">
 <INLINE>
 <![CDATA[
 # Finish APCUPSD Install
@@ -679,6 +679,8 @@ if [ -f /boot/config/plugins/powerdown-x86_64.plg ]
 then
   /usr/local/sbin/installplg /boot/config/plugins/powerdown-x86_64.plg
 fi
+
+rm /tmp/apcupsd-install
 ]]>
 </INLINE>
 </FILE>
