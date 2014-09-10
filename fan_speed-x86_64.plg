@@ -1,0 +1,726 @@
+<?xml version='1.0' standalone='yes'?>
+
+<!DOCTYPE PLUGIN [
+<!ENTITY name      "fan_speed">
+<!ENTITY author    "dlandon">
+<!ENTITY version   "2014.09.10">
+<!ENTITY category  "Fan Speed Control">
+<!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
+]>
+
+<PLUGIN  name="&name;"
+         author="&author;"
+         version="&version;"
+         category="&category;"
+         pluginURL="&pluginURL;">
+
+<!--
+Description
+=======================================================================================
+Name: 			fan_speed-x86_64.plg
+=======================================================================================
+Version:    	2011-10-15 - first release
+=======================================================================================
+Description:	This is a simple plug-in to control fan speed..
+=======================================================================================
+Files that will be installed:
+  /boot/config/plugins/fan_speed-x86_64.plg						# this file
+  /boot/config/plugins/fan_speed/fan_speed.png					# icon file
+  /usr/local/emhttp/plugins/fan_speed/fan_speed.png				# local icon file
+  /boot/config/plugins/fan_speed/fan_speed.cfg					# plugin configuration file
+  /boot/config/plugins/fan_speed/fan_speed.sh					# main script
+  /usr/local/emhttp/plugins/fan_speed/Fan_speed.page    		# page file for webGui menu system
+  /usr/local/emhttp/plugins/fan_speed/Fan_speed.php				# webGui page code
+  /usr/local/emhttp/plugins/fan_speed/event/disks_mounted		# mount event handler
+  /usr/local/emhttp/plugins/fan_speed/event/unmounting_disks	# unmount event handler
+  /tmp/fan_speed-install										# install script
+  /boot/config/plugins/fan_speed/README.html					# readme file
+=======================================================================================
+-->
+
+<!-- The readme file
+HTML readme file.
+-->
+<FILE Name="/boot/config/plugins/&name;/README.html" Mode="0770">
+<INLINE>
+<![CDATA[
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+</head>
+<title>Fan Control Readme</title>
+<body lang=EN-US>
+<span style="font-family:arial; font-size:12px;">
+<p><b>Fan Control:</b></p>
+<p>A simple script to check for the highest hard disk temperature and then set the fan to an appropriate speed. You need a motherboard with PWM support and of course a PWM fan.</p>
+<p>Notes:</p>
+<ul>
+ <li>You must load the correct divers for *your* motherboard.  You may have to install perl first - easiest way is via unmenu. Search the forums...  You must run "sensors-detect" at the command prompt and then add the sensors detected via "modprobe".  You will actually have to edit the plugin for your motherboard. Bummer, I know.</li>
+ <li>The fan device depends on *your* system.  After you get the sensor drivers loaded you can use the command &quot;pwmconfig&quot; to help with finding this out. pwm1 is usually the cpu fan.</li>
+ <li>You can use the command structure &quot;cat/sys/class/hwmon/hwmon1/device/fan4_input&quot; to see the current rpm of *your* fan. The command will have to be tailored to your system. If 0 then fan is off or there is no fan connected or motherboard can't read rpm of fan.</li>
+ <li>Run pwmconfig (part of the lm_sensors package) to determine what numbers you want to use for your fan PWM settings.</li>
+ <li>No matter what off value you use some (many?) PWM fans simply will not turn off. If this is the case set your low and off values to the same (low) value. Values can be any real number between 0 and 255.</li>
+</ul>
+<p>&nbsp;</p>
+<form>
+<input type=button value="Close Window" onClick="javascript:window.close();">
+</form>
+</span>
+</body>
+</html>
+]]></INLINE>
+</FILE>
+
+<!-- The icon file
+Icons should be 48x48 pixels, preferably .png files. No need to check the MD5 so we 
+don't include that element.  We store this in the plugin-specific persistent directory 
+to avoid having to re-download.
+-->
+<FILE Name="/boot/config/plugins/&name;/&name;.png">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/fan_speed.png</URL>
+</FILE>
+
+<!-- The configuration file
+This is an "INLINE" file.  Note that we use a CDATA section to contain the text of the file.  This
+is to prevent the XML parser from "interpreting" the contents and permits us to not be concerned
+with "escaping" certain characters.  When an INLINE file is created, the php trim() function is used
+to strip off any leading and trailing whitespace from the INLINE data contents.  This particular file 
+is our "plugin configuration" file.
+-->
+<FILE Name="/boot/config/plugins/&name;/&name;.cfg">
+<INLINE>
+<![CDATA[
+# fan_speed configuration
+SERVICE="disable"
+FAN_OFF_TEMP="32"
+FAN_HIGH_TEMP="38"
+FAN_OFF_PWM="45"
+FAN_LOW_PWM="45"
+FAN_HIGH_PWM="165"
+MINUTES="5"
+]]>
+</INLINE>
+</FILE>
+
+<!--The control script
+This file defines the "fan_speed" control script.  This script follows the form of other 
+control scripts in the /etc/rc.d directory.  
+
+After the kernel has initialized all devices at startup, it starts init(8), which in turn runs /etc/rc.
+/etc/rc sorts the scripts in /etc/rc.d using rcorder(8) and then runs them in that order. 
+
+Since we will be "executing" this script as a command from other scripts, we must set it's "mode" to 
+be executable using the Mode attribute.  Control scripts normally include start, stop, and restart 
+functions.  In addition to those, we are implementing "enable" and "disable" to turn the add-in off 
+and on.  Enabling the add-in means it will survive reboots, and array start and stop actions.
+-->
+<FILE Name="/etc/rc.d/rc.fan_speed" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+#=======================================================================================
+#  Name:	rc.fan_speed
+#=======================================================================================
+#  Description:	
+#
+#  A script to start|stop|enable|disable your main program script.  Control 
+#  scripts normally include start, stop, and restart functions.  In addition, 
+#  we are implementing enable and disable to turn the add-in off and on.  Enabling the 
+#  add-in means it will survive reboots, and array start and stop actions.
+#
+#  Enable: Turns the main program script on (saves variables and starts program)
+#  Disable: Turns the main program script off (saves variables and stops program)
+#  Start: Reads config file and starts the main program
+#  Stop: Reads config file and stops the main program
+#  Restart: not implemented/not used
+#
+#  Variables passed to script:
+#	- arg1 = ACTION 	= start|stop|enable|disable
+#	- arg2 = OFF_TEMP 	= 0-99, Disk low temp in C
+#	- arg3 = HIGH_TEMP 	= 0-99, Disk high temp in C
+#	- arg4 = OFF_PWM 	= 0-255, PWM setting for OFF
+#	- arg5 = LOW_PWM 	= 0-255, PWM setting for low speed
+#	- arg6 = HIGH_PWM 	= 0-255, PWM seeting for high speed
+#	- arg7 = MIN 		= 0-99, Minutes to sleep
+#=======================================================================================
+# Version 1.0   Authored by Dan Stroot
+#=======================================================================================
+PROGRAM_NAME=`basename $0`
+SERVICE_NAME="fan_speed"
+CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
+CMDLINE="/boot/config/plugins/fan_speed/fan_speed.sh >/dev/null 2>&1"
+LOCKFILE="/var/lock/fan_speed.lck"
+LOCK_PID=""
+PID_RUNNING=""
+if [ -f "${LOCKFILE}" ]; then
+	# The file exists so read the PID to see if it is still running
+	LOCK_PID=`head -n 1 "${LOCKFILE}"`
+	PID_RUNNING=`ps -p "${LOCK_PID}" | grep ${LOCK_PID}`
+fi 
+#=======================================================================================
+# Functions (must be declared before they can be called)
+#=======================================================================================
+write_config() {
+	echo -n "Writing ${SERVICE_NAME} configuration...  "
+	echo "# fan_speed configuration" > $CFGFILE
+	echo "SERVICE=\"$SERVICE\"" >> $CFGFILE
+	echo "FAN_OFF_TEMP=\"$FAN_OFF_TEMP\"" >> $CFGFILE
+	echo "FAN_HIGH_TEMP=\"$FAN_HIGH_TEMP\"" >> $CFGFILE
+	echo "FAN_OFF_PWM=\"$FAN_OFF_PWM\"" >> $CFGFILE
+	echo "FAN_LOW_PWM=\"$FAN_LOW_PWM\"" >> $CFGFILE
+	echo "FAN_HIGH_PWM=\"$FAN_HIGH_PWM\"" >> $CFGFILE
+	echo "MINUTES=\"$MINUTES\"" >> $CFGFILE
+}
+fan_speed_start() {
+	if [ $SERVICE = "enable" ]; then
+		if [ -z "${PID_RUNNING}" ]; then  	# -z STRING = True if string *is* empty.
+			# Start the script
+			echo -n "Starting ${SERVICE_NAME}: $CMDLINE" | logger -t$PROGRAM_NAME 
+			touch $LOCKFILE
+			echo "$CMDLINE" | at now 
+			exit 0
+		else
+			# no-op: if already running do nothing
+			echo "WARNING: $SERVICE_NAME is already running PID:[${LOCK_PID} ]" | logger -t$PROGRAM_NAME
+			exit 2
+		fi
+	else
+		# no-op: if action not = enabled
+		echo "WARNING: $SERVICE_NAME called to start with SERVICE not = enabled" | logger -t$PROGRAM_NAME
+		exit 0
+	fi
+}
+fan_speed_stop() {
+	if [ $SERVICE = "disable" ]; then
+		if [ -f "${LOCKFILE}" ] && [ -n "${PID_RUNNING}" ]; then  # if LOCKFILE exists and the PID is running
+			echo -n "Stopping $SERVICE_NAME PID:[${LOCK_PID}]" | logger -t$PROGRAM_NAME
+			kill $LOCK_PID
+			rm $LOCKFILE
+			exit 0
+		else
+			# no-op: if there is no LOCKFILE, or the PID is blank, the process is not running
+			echo "WARNING: $SERVICE_NAME is not currently running " | logger -t$PROGRAM_NAME
+			if [ -f "${LOCKFILE}" ]; then  # in case of empty LOCKFILE
+			    rm $LOCKFILE
+			fi
+			exit 2
+		fi
+	else
+		# no-op: if action not = disabled
+		echo "WARNING: $SERVICE_NAME called to stop with SERVICE not = disabled"  | logger -t$PROGRAM_NAME
+		exit 0
+	fi
+}
+#=======================================================================================
+# Read configuration file (will look like comment below)
+#=======================================================================================
+#	# fan_speed configuration
+#	SERVICE="disable"
+#	FAN_OFF_TEMP=32		
+#	FAN_HIGH_TEMP=38	
+#	FAN_OFF_PWM=127		
+#	FAN_LOW_PWM=127		 
+#	FAN_HIGH_PWM=195	
+#	MINUTES=5
+#=======================================================================================
+source $CFGFILE
+#=======================================================================================
+# Case Statement
+#=======================================================================================
+# Use our passed in arguments to determine what to do.  $1 is the first argument, $2 
+# the next, etc.  
+#=======================================================================================
+ACTION=$1
+OFF_TEMP=$2		
+HIGH_TEMP=$3	
+OFF_PWM=$4	
+LOW_PWM=$5	 
+HIGH_PWM=$6	
+MIN=$7
+
+case "$ACTION" in
+'start')
+  fan_speed_start
+  ;;
+'stop')
+  fan_speed_stop
+  ;;
+'enable')
+  SERVICE=$ACTION			# Set service enabled
+  FAN_OFF_TEMP=$OFF_TEMP	# Set new values
+  FAN_HIGH_TEMP=$HIGH_TEMP	
+  FAN_OFF_PWM=$OFF_PWM
+  FAN_LOW_PWM=$LOW_PWM
+  FAN_HIGH_PWM=$HIGH_PWM
+  MINUTES=$MIN
+  write_config   			# Save configuration
+  fan_speed_start
+  ;;
+'disable')
+  SERVICE=$ACTION           # Set service disabled
+  write_config              # Save configuration
+  fan_speed_stop
+  ;;
+*)
+  echo "usage $0 start|stop|enable|disable"
+esac
+#=======================================================================================
+# END	rc.fan_speed
+#=======================================================================================
+]]>
+</INLINE>
+</FILE>
+
+<!-- The *MAIN* script
+This file defines the fan_speed script.  This is where all our script functionality lives.
+In other words this is where you main logic goes for what you want to do.  In this simple 
+example we are simply displaying a message - like all "hello world" programs.  ;)
+It's "mode" to be executable using the Mode attribute.
+-->
+<FILE Name="/boot/config/plugins/&name;/&name;.sh" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/sh
+#=======================================================================================
+#  Name:	fan_speed.sh
+#=======================================================================================
+#  Description:	
+#
+#	A simple script to check for the highest hard disk temperature and then set the 
+#  	fan to an apropriate speed. Fan needs to be connected to a motherboard with pwm 
+#  	support.
+#
+#=======================================================================================
+# Version 1.0   Authored by Dan Stroot
+#=======================================================================================
+PROGRAM_NAME=`basename $0`
+LOCKFILE="/var/lock/fan_speed.lck"
+CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
+#=======================================================================================
+# Configuration file (will look like comment below)
+#=======================================================================================
+#	# fan_speed configuration
+#	SERVICE="disable"	 # Service is either enabled or disabled
+#	FAN_OFF_TEMP=32		 # Anything this number and below - fan is *off*
+#	FAN_HIGH_TEMP=38	 # Anything this number and above - fan is *full*
+#	FAN_OFF_PWM=127		 # Off Value (note: many PWM fans will not turn off)
+#	FAN_LOW_PWM=127		 # Value to make your fan go slow
+#	FAN_HIGH_PWM=195	 # Value to make your fan go fast
+#	MINUTES=5			 # The default number of minutes to loop
+#=======================================================================================
+source $CFGFILE
+#=======================================================================================
+# USER DEFINED VARIABLES: *MUST* BE SET TO *YOUR* VALUES
+#=======================================================================================
+# You must load the correct divers for *your* motherboard.  You must run "sensors-detect" at 
+# the command prompt and the add the sensors detected via "modprobe".  You may have to install 
+# perl first - easiest way is via unmenu. Search the forums... 
+
+# Load adapter drivers:
+modprobe ipmi-si
+# Load chip drivers:
+modprobe coretemp
+modprobe w83627ehf
+
+# Fan device. Depends on *your* system. pwmconfig can help with finding this out. 
+# pwm1 is usually the cpu fan. You can "cat /sys/class/hwmon/hwmon1/device/fan4_input"
+# to see the current rpm of the fan. If 0 then fan is off or there is no fan connected 
+# or motherboard can't read rpm of fan.
+ARRAY_FAN=/sys/class/hwmon/hwmon1/device/pwm4				# Power (speed) setting
+ARRAY_FAN_INPUT=/sys/class/hwmon/hwmon1/device/fan4_input	# Used to track actual rpm values
+#=======================================================================================
+# PROGRAM LOGIC - CHANGE AT YOUR PERIL ;)
+#=======================================================================================
+# Calculate size of increments to use when changing fan speed. 
+FAN_TEMP_DIFF=$(($FAN_HIGH_TEMP-$FAN_OFF_TEMP))  
+FAN_PWM_INCREMENTS=$(($(($FAN_HIGH_PWM-$FAN_LOW_PWM))/$FAN_TEMP_DIFF))
+
+# Obtain the ID of your flash drive (your flash drive is named "UnRaid" right?)
+flash=/dev/`ls -l /dev/disk/by-label| grep UNRAID | cut -d/ -f3 | cut -c 1-3`
+
+# Count the number of drives in your array (ignoring the flash drive we identified)
+NUM_OF_DRIVES=$((ls /dev/[hs]d? | grep -v "$flash") | wc -l)
+
+# Identify the drives in your array so we can test their temperature
+COUNT=1
+for d in $(ls /dev/[hs]d? | grep -v "$flash")
+do
+	HD[$COUNT]=$d
+	#echo HDD=${HD[$COUNT]}								# Uncomment for debugging
+	COUNT=$[$COUNT+1]
+done
+
+get_highest_hd_temp() {
+	# while loop to get the highest temperature of active drives. 
+	# If all are spun down then high temp will be set to 0.	
+	CURRENT_TEMP=0
+	HIGHEST_TEMP=0
+	CURRENT_DRIVE=1
+	while [ $CURRENT_DRIVE -le $NUM_OF_DRIVES ]
+	do
+		SLEEPING=`hdparm -C ${HD[$CURRENT_DRIVE]} | grep -c standby`
+		if [ "$SLEEPING" -eq 0 ]; then
+			CURRENT_TEMP=`smartctl -d ata -A ${HD[$CURRENT_DRIVE]} | grep -m 1 -i Temperature_Celsius | awk '{print $10}'`
+			if [ "$HIGHEST_TEMP" -le "$CURRENT_TEMP" ]; then
+				HIGHEST_TEMP=$CURRENT_TEMP
+			fi
+		fi
+		CURRENT_DRIVE=$[$CURRENT_DRIVE+1]
+	done
+}
+
+get_current_fan_speed() {
+	# Function to get current fan values
+	CURRENT_FAN_SPEED=0
+	CURRENT_FAN_RPM=0
+	CURRENT_PERCENT_SPEED=0
+	CURRENT_FAN_SPEED=`cat $ARRAY_FAN`
+	CURRENT_FAN_RPM=`cat $ARRAY_FAN_INPUT`
+	CURRENT_PERCENT_SPEED=$(($(($CURRENT_FAN_SPEED*100))/$FAN_HIGH_PWM))
+	#echo Current Fan Speed = $CURRENT_FAN_SPEED    		# Uncomment for debugging
+	#echo Current Fan RPM = $CURRENT_FAN_RPM				# Uncomment for debugging
+	#echo Current Percent Speed = $CURRENT_PERCENT_SPEED	# Uncomment for debugging
+	if [ "$CURRENT_FAN_SPEED" -le "$FAN_OFF_PWM" ]; then
+		CURRENT_OUTPUT="OFF (0% @ 0 rpm)"
+		#echo Current output = $CURRENT_OUTPUT				# Uncomment for debugging
+	else
+		if [ "$CURRENT_FAN_SPEED" -ge "$FAN_HIGH_PWM" ]; then
+			CURRENT_OUTPUT="FULL (100% @ "$CURRENT_FAN_RPM" rpm)"
+			#echo Current output = $CURRENT_OUTPUT			# Uncomment for debugging
+		else
+			CURRENT_OUTPUT="$CURRENT_FAN_SPEED ($CURRENT_PERCENT_SPEED% @ $CURRENT_FAN_RPM rpm)"
+			#echo Current output = $CURRENT_OUTPUT			# Uncomment for debugging
+		fi
+	fi
+}
+
+calc_new_fan_speed() {
+	# Calculate new fan values based on highest drive temperature
+	ADJUSTED_FAN_SPEED=0
+	ADJUSTED_PERCENT_SPEED=100
+	DIFF_FROM_FAN_OFF_TEMP=0
+	DIFF_FROM_FAN_OFF_TEMP=$(($HIGHEST_TEMP-$FAN_OFF_TEMP))
+	if [ "$HIGHEST_TEMP" -le "$FAN_OFF_TEMP" ]; then
+		ADJUSTED_FAN_SPEED=$FAN_OFF_PWM
+		ADJUSTED_PERCENT_SPEED=0
+		ADJUSTED_OUTPUT="OFF"
+	else
+		if [ "$HIGHEST_TEMP" -ge "$FAN_HIGH_TEMP" ]; then
+			ADJUSTED_FAN_SPEED=$FAN_HIGH_PWM
+			ADJUSTED_PERCENT_SPEED=100
+			ADJUSTED_OUTPUT="FULL"
+		else
+			ADJUSTED_FAN_SPEED=$(($(($DIFF_FROM_FAN_OFF_TEMP*$FAN_PWM_INCREMENTS))+$FAN_LOW_PWM))
+			ADJUSTED_PERCENT_SPEED=$(($(($ADJUSTED_FAN_SPEED*100))/$FAN_HIGH_PWM))
+			ADJUSTED_OUTPUT=$ADJUSTED_FAN_SPEED	 
+		fi
+	fi
+	#echo Adjusted output = $ADJUSTED_OUTPUT 			# Uncomment for debugging
+}
+
+change_fan_speed() {
+	# Implemenent fan speed change
+	# Enable speed change on fan
+	if [ `cat ${ARRAY_FAN}_enable` != "1" ]; then
+		echo 1 > "${ARRAY_FAN}_enable"
+	fi
+	# Make adjustment as needed
+	if [ "$CURRENT_FAN_SPEED" -ne "$ADJUSTED_FAN_SPEED" ]; then
+		# set fan to new value
+		echo $ADJUSTED_FAN_SPEED > $ARRAY_FAN
+		sleep 5
+		# Get new rpm value
+		ADJUSTED_FAN_RPM=`cat $ARRAY_FAN_INPUT`
+		ADJUSTED_OUTPUT=$ADJUSTED_OUTPUT" ("$ADJUSTED_PERCENT_SPEED"% @ "$ADJUSTED_FAN_RPM" rpm)"
+		# Output the change
+		echo "Highest disk drive temp is: ${HIGHEST_TEMP}C" | logger -t$PROGRAM_NAME
+		echo "Changing disk drive fan speed from: [${CURRENT_OUTPUT} ] to: [${ADJUSTED_OUTPUT} ]" | logger -t$PROGRAM_NAME
+	fi
+}
+
+#=======================================================================================
+# Main Program Logic
+#=======================================================================================
+while [ -f "$LOCKFILE" ]
+do
+	get_highest_hd_temp
+	get_current_fan_speed
+	calc_new_fan_speed
+	change_fan_speed
+	sleep $(($MINUTES*60))
+done &
+#=======================================================================================
+# Save the PID, disown the loop in the background
+#=======================================================================================
+# Save the loop process ID in the lockfile.
+# We can stop the loop by simply removing the lockfile: rm /var/lock/fan_speed.lck
+# or reading the lockfile for the PID to kill.
+#=======================================================================================
+background_pid=$!
+echo $background_pid > "${LOCKFILE}"
+echo "Process ID [${background_pid}] started" | logger -t$PROGRAM_NAME 
+disown %%
+#=======================================================================================
+# END	fan_speed.sh
+#=======================================================================================
+]]>
+</INLINE>
+</FILE>
+
+<!-- Event Handlers
+Here are a couple "event handler" scripts.  These scripts are created in the "event" directory of
+the webGui plugin.  They are invoked automatically by emhttp when the corresponding event occurs.
+Callout script:  /usr/local/emhttp/emhttp_event
+
+Here's the events currently listed in the 5.0 beta:
+
+driver_loaded
+#   Occurs early in emhttp initialization.
+#   Can also occur as a result of init-config and device slot change.
+#   Status information is valid.
+
+array_started
+#   Occurs during cmdStart execution.
+#   The 'md' devices are valid.
+
+disks_mounted
+#   Occurs during cmdStart execution.
+#   The disks and user shares (if enabled) are mounted.
+
+svcs_started
+#   Occurs during cmdStart execution.
+#   The network services (samba, nfs, etc.) are started.
+
+started
+#   Signals end of cmdStart execution.
+
+svcs_restarted
+#   Occurs as a result of changing/adding/deleting a share.
+#   The network services are started and may be exporting different share(s).
+
+stopping_svcs
+#   Occurs during cmdStop exeuction.
+#   Nothing has actually been stopped yet, about to stop network services.
+
+unmounting_disks
+#   Occurs during cmdStop execution.
+#   The network services have been stopped, about to unmount the disks.
+
+stopping_array
+#   Occurs during cmdStop exection.
+#   The disks have been unmounted, about to stop the array.
+
+stopped
+#   Occurs at end of cmdStop execution.
+#   The array has been stopped.
+-->
+
+<!-- Start event handler -->
+<FILE Name="/usr/local/emhttp/plugins/&name;/event/disks_mounted" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/etc/rc.d/rc.fan_speed start
+]]>
+</INLINE>
+
+</FILE>
+<!-- Stop event handler -->
+<FILE Name="/usr/local/emhttp/plugins/&name;/event/unmounting_disks" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/etc/rc.d/rc.fan_speed stop
+]]>
+</INLINE>
+</FILE>
+
+<!-- UnRaid GUI files 
+These files are required to hook the plugin into the unRaid webGui menu system 
+-->
+<!-- UnRaid Menu
+The page file defines which menu page the plugin will appear on.
+-->
+<FILE Name="/usr/local/emhttp/plugins/&name;/Fan_speed.page">
+<INLINE>
+<![CDATA[
+Author="Daniel Stroot"
+Title="Fan Control"
+Menu="OtherSettings"
+Icon="fan_speed.png"
+Version="1.0"
+Type="php"
+]]>
+</INLINE>
+</FILE>
+
+<!-- Icon File
+This is the icon displayed in the webGui. We use a LOCAL element here to specify that the icon
+file may be found and copied from the local file system.  This is the icon file we downloaded
+previously.  The reason we do this is that the unRaid webGui directory is reinitialized upon each
+reboot, and using a LOCAL file is faster and more reliable than re-downloaded every time.
+-->
+<FILE Name="/usr/local/emhttp/plugins/&name;/&name;.png">
+<LOCAL>/boot/config/plugins/&name;/&name;.png</LOCAL>
+</FILE>
+
+<!-- Php file
+Here is the PHP code for the fan_speed webGui configuration page.  This is a simple page that
+defines a couple controls for the user and indicates whether fan_speed is running or not.  It also
+illustrates the method by which the control script can be invoked by emhttp, and the use of javascript
+to dynamically enable/disable form elements.
+-->
+<FILE Name="/usr/local/emhttp/plugins/&name;/Fan_speed.php">
+<INLINE>
+<![CDATA[
+<?PHP
+$fan_speed_cfg = parse_ini_file( "/boot/config/plugins/fan_speed/fan_speed.cfg");
+$fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
+?>
+<!--
+	This page is a simple form to enable and disable the "fan_speed.sh" script.
+	When this form is submitted, emhttp will see a GET request like this:
+	"GET /update.htm?cmd=/etc/rc.d/rc.fan_speed&arg1=value1&arg2=value2&runCmd=Apply"
+   
+	The 'runCmd=Apply' tells emhttp to run the command given by 'cmd' with arguments 'arg1', 'arg2', ...
+		- arg1 = ACTION 	= enable|disable
+		- arg2 = OFF_TEMP 	= 0-99, Disk low temp in C
+		- arg3 = HIGH_TEMP 	= 0-99, Disk high temp in C
+		- arg4 = OFF_PWM 	= 0-255, PWM setting for OFF
+		- arg5 = LOW_PWM 	= 0-255, PWM setting for low speed
+		- arg6 = HIGH_PWM 	= 0-255, PWM seeting for high speed
+		- arg7 = MIN 		= 0-99, Minutes to sleep
+	
+	The output of this command will show up in the 'progress frame' of the webpage - near the bottom.
+-->    
+   <form name="fan_speed_settings" method="POST" action="/update.htm" target="progressFrame">
+      <input type="hidden" name="cmd" value="/etc/rc.d/rc.fan_speed">
+      <table class="settings">
+         <tr>
+         <td>Enable Fan Speed:</td>
+         <td><select name="arg1" size="1"  onChange="activateAPPLYBTN(this.form);">
+            <?=mk_option($fan_speed_cfg['SERVICE'], "disable", "No");?>
+            <?=mk_option($fan_speed_cfg['SERVICE'], "enable", "Yes");?>
+            </select></td>
+         </tr>
+ 		 <tr>
+         <td>Fan Off Temperature (0-99 degrees celsius):</td>
+         <td><input type="text" name="arg2" maxlength="2" value="<?=$fan_speed_cfg['FAN_OFF_TEMP'];?>"></td>
+         </tr>
+		 <tr>
+         <td>Fan High Temperature (0-99 degrees celsius):</td>
+         <td><input type="text" name="arg3" maxlength="2" value="<?=$fan_speed_cfg['FAN_HIGH_TEMP'];?>"></td>
+         </tr>
+		 <tr>
+         <td>PWM Off Setting (0-255):</td>
+         <td><input type="text" name="arg4" maxlength="3" value="<?=$fan_speed_cfg['FAN_OFF_PWM'];?>"></td>
+         </tr>
+		 <tr>
+         <td>PWM Low Setting (0-255):</td>
+         <td><input type="text" name="arg5" maxlength="3" value="<?=$fan_speed_cfg['FAN_LOW_PWM'];?>"></td>
+         </tr>
+		 <tr>
+         <td>PWM High Setting (0-255):</td>
+         <td><input type="text" name="arg6" maxlength="3" value="<?=$fan_speed_cfg['FAN_HIGH_PWM'];?>"></td>
+         </tr>
+		 <tr>
+         <td>How often to check (0-99 minutes):</td>
+         <td><input type="text" name="arg7" maxlength="2" value="<?=$fan_speed_cfg['MINUTES'];?>"></td>
+         </tr>
+		 <tr>
+         <td></td>
+         <td><input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</b>
+         </tr>
+      </table>
+   </form>
+<? if ($fan_speed_running=="yes"): ?>
+    <hr>
+	<p class=ContentTitle>Fan Control is running!</p>
+<? endif; ?>
+	<p><a href="/boot/config/plugins/fan_speed/README.html" target="_blank">Readme</a></p>
+	
+<script type="text/javascript">
+function activateAPPLYBTN(form) 
+{
+	if ("<?=$fan_speed_running;?>" == "yes") {
+		if (form.arg1.value == "enable") {
+			form.arg1.value = "disable";
+			form.arg2.disabled = true;
+			form.arg3.disabled = true;
+			form.arg4.disabled = true;
+			form.arg5.disabled = true;
+			form.arg6.disabled = true;
+			form.arg7.disabled = true;
+		}
+		else if (formarg1.value == "disable") {
+			form.arg2.disabled = true;
+			form.arg3.disabled = true;
+			form.arg4.disabled = true;
+			form.arg5.disabled = true;
+			form.arg6.disabled = true;
+			form.arg7.disabled = true;
+		}
+	}
+	else {
+		if (form.arg1.value == "disable") {
+			form.arg1.value = "enable";
+			form.arg2.disabled = false;
+			form.arg3.disabled = false;
+			form.arg4.disabled = false;
+			form.arg5.disabled = false;
+			form.arg6.disabled = false;
+			form.arg7.disabled = false;			
+		}
+		else if (form.arg1.value == "enable") {
+			form.arg2.disabled = false; 
+			form.arg3.disabled = false;
+			form.arg4.disabled = false;
+			form.arg5.disabled = false;
+			form.arg6.disabled = false;
+			form.arg7.disabled = false;
+		}
+	}
+}
+activateAPPLYBTN(document.fan_speed_settings);
+</script>
+]]>
+</INLINE>
+</FILE>
+
+<!--
+Create plugin README.md file
+-->
+<FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
+<INLINE>
+**Fan speed control**
+
+This plugin is for fan speed control.  You must load the correct divers for your motherboard.
+</INLINE>
+</FILE>
+
+<!--
+The 'remove' script.
+-->
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+rm -r /usr/local/emhttp/plugins/&name;
+rm -r /boot/config/plugins/&name;
+</INLINE>
+</FILE>
+
+<!-- Installation script
+The plugin installation script. This script is run *every* time upon system start-up 
+and/or when the plugin is installed.  We will just call the start command.  If the 
+plugin is enabled it will start, otherwise nothing will happen.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+<![CDATA[
+# start
+/etc/rc.d/rc.fan_speed start
+]]>
+</INLINE>
+</FILE>
+
+</PLUGIN>
