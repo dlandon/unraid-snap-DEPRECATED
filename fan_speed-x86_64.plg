@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.10">
+<!ENTITY version   "2014.09.10-1">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -115,7 +115,7 @@ be executable using the Mode attribute.  Control scripts normally include start,
 functions.  In addition to those, we are implementing "enable" and "disable" to turn the add-in off 
 and on.  Enabling the add-in means it will survive reboots, and array start and stop actions.
 -->
-<FILE Name="/etc/rc.d/rc.fan_speed" Mode="0770">
+<FILE Name="/etc/rc.d/rc.&name;" Mode="0770">
 <INLINE>
 <![CDATA[
 #!/bin/bash
@@ -473,7 +473,7 @@ Here are a couple "event handler" scripts.  These scripts are created in the "ev
 the webGui plugin.  They are invoked automatically by emhttp when the corresponding event occurs.
 Callout script:  /usr/local/emhttp/emhttp_event
 
-Here's the events currently listed in the 5.0 beta:
+Here's the events currently listed in the 6.0 beta:
 
 driver_loaded
 #   Occurs early in emhttp initialization.
@@ -519,20 +519,16 @@ stopped
 <!-- Start event handler -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/event/disks_mounted" Mode="0770">
 <INLINE>
-<![CDATA[
 #!/bin/bash
-/etc/rc.d/rc.fan_speed start
-]]>
+/etc/rc.d/rc.&name; start
 </INLINE>
 
 </FILE>
 <!-- Stop event handler -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/event/unmounting_disks" Mode="0770">
 <INLINE>
-<![CDATA[
 #!/bin/bash
-/etc/rc.d/rc.fan_speed stop
-]]>
+/etc/rc.d/rc.&name; stop
 </INLINE>
 </FILE>
 
@@ -704,6 +700,10 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
+# stop fan control
+/etc/rc.d/rc.&name; stop
+
+rm /etc/rc.d/rc.&name;
 rm -r /usr/local/emhttp/plugins/&name;
 rm -r /boot/config/plugins/&name;
 </INLINE>
@@ -716,10 +716,8 @@ plugin is enabled it will start, otherwise nothing will happen.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
-<![CDATA[
 # start
-/etc/rc.d/rc.fan_speed start
-]]>
+/etc/rc.d/rc.&name; start
 </INLINE>
 </FILE>
 
