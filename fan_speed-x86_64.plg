@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.10-1">
+<!ENTITY version   "2014.09.10-2">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -357,6 +357,7 @@ get_highest_hd_temp() {
 	CURRENT_TEMP=0
 	HIGHEST_TEMP=0
 	CURRENT_DRIVE=1
+	HIGHEST_TEMP_DRIVE=""
 	while [ $CURRENT_DRIVE -le $NUM_OF_DRIVES ]
 	do
 		SLEEPING=`hdparm -C ${HD[$CURRENT_DRIVE]} | grep -c standby`
@@ -364,6 +365,7 @@ get_highest_hd_temp() {
 			CURRENT_TEMP=`smartctl -d ata -A ${HD[$CURRENT_DRIVE]} | grep -m 1 -i Temperature_Celsius | awk '{print $10}'`
 			if [ "$HIGHEST_TEMP" -le "$CURRENT_TEMP" ]; then
 				HIGHEST_TEMP=$CURRENT_TEMP
+				HIGHEST_TEMP_DRIVE=${HD[$CURRENT_DRIVE]}
 			fi
 		fi
 		CURRENT_DRIVE=$[$CURRENT_DRIVE+1]
@@ -434,7 +436,7 @@ change_fan_speed() {
 		ADJUSTED_FAN_RPM=`cat $ARRAY_FAN_INPUT`
 		ADJUSTED_OUTPUT=$ADJUSTED_OUTPUT" ("$ADJUSTED_PERCENT_SPEED"% @ "$ADJUSTED_FAN_RPM" rpm)"
 		# Output the change
-		echo "Highest disk drive temp is: ${HIGHEST_TEMP}C" | logger -t$PROGRAM_NAME
+		echo "Highest disk drive temp is: ${HIGHEST_TEMP}C on Drive: $(HIGHEST_TEMP_DRIVE)" | logger -t$PROGRAM_NAME
 		echo "Changing disk drive fan speed from: [${CURRENT_OUTPUT} ] to: [${ADJUSTED_OUTPUT} ]" | logger -t$PROGRAM_NAME
 	fi
 }
