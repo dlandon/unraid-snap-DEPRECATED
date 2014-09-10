@@ -1,9 +1,9 @@
 <?xml version='1.0' standalone='yes'?>
 
 <!DOCTYPE PLUGIN [
-<!ENTITY name      "apcups">
+<!ENTITY name      "apcupsd">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.08-1">
+<!ENTITY version   "2014.09.10">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -59,14 +59,14 @@ Download the powerdown plugin.
 <URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg</URL>
 </FILE>
 
-<FILE Name="/boot/config/plugins/apcupsd/apcupsd.png">
+<FILE Name="/boot/config/plugins/&name;/&name;.png">
 <URL>https://github.com/dlandon/unraid-snap/raw/master/Apcupsd.png</URL>
 </FILE>
 
 <!--
 Create the default configuration file.
 -->
-<FILE Name="/boot/config/plugins/apcupsd/apcupsd.cfg">
+<FILE Name="/boot/config/plugins/&name;/&name;.cfg">
 <INLINE>
 <![CDATA[
 # apcupsd configuration
@@ -87,14 +87,14 @@ SHOWFULLSTATUS="NO"
 Icon.
 -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/&name;.png">
-<LOCAL>/boot/config/plugins/apcupsd/apcupsd.png</LOCAL>
+<LOCAL>/boot/config/plugins/&name;/&name;.png</LOCAL>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/&name;/Apcups.page">
+<FILE Name="/usr/local/emhttp/plugins/&name;/Apcupsd.page">
 <INLINE>
 <![CDATA[
 Menu="OtherSettings"
-Icon="apcups.png"
+Icon="apcupsd.png"
 Version="2014.09.06"
 Author="SeeDrs"
 Type="php"
@@ -104,9 +104,9 @@ Title="APC UPS"
 </FILE>
 
 <!--
-Apcups.php.
+Apcupsd.php.
 -->
-<FILE Name="/usr/local/emhttp/plugins/&name;/Apcups.php">
+<FILE Name="/usr/local/emhttp/plugins/&name;/Apcupsd.php">
 <INLINE>
 <![CDATA[
 <?PHP
@@ -186,7 +186,7 @@ Apcups.php.
 }
 </style>
    <br />
-   <form name="apcupsd_settings" method="POST" action="/plugins/apcups/apcupsdctl.php" target="progressFrame">
+   <form name="apcupsd_settings" method="POST" action="/plugins/apcupsd/apcupsdctl.php" target="progressFrame">
       <input type="hidden" name="cmd" value="apply">
        <table>
          <tr>
@@ -222,7 +222,7 @@ Apcups.php.
             ?>      
           </td>
           <td>
-            <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Batttery Charge: </span><span class="<?=$bchargecolour;?>"><?=$bcharge;?>%</span><? endif; ?>
+            <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Battery Charge: </span><span class="<?=$bchargecolour;?>"><?=$bcharge;?>%</span><? endif; ?>
           </td>
           <td>
              <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Time Left: </span><span class="<?=$timeleftcolour;?>"><?=$timeleft;?></span><? endif; ?>
@@ -650,8 +650,8 @@ The 'remove' script.
 rm /boot/packages/apcupsd-3.14.12-x86_64-4.tgz
 removepkg apcupsd
 rm -r /usr/local/emhttp/plugins/&name;
-rm -r /boot/config/plugins/apcupsd
-rm -r /var/log/apcupsd
+rm -r /boot/config/plugins/&name;
+rm -r /var/log/&name;
 </INLINE>
 </FILE>
 
@@ -672,7 +672,7 @@ sed -i -e "/^WALL=wall/c\WALL=\"mail -s 'unRAID_Server_UPS_Alert' root\"/" /etc/
 sed -i -e "s/\$0 stop/\$0 stop\n       sleep 3/" /etc/rc.d/rc.apcupsd
 
 #Start APCUPSD if enabled
-php /usr/local/emhttp/plugins/apcups/apcupsdctl.php "autostart"
+php /usr/local/emhttp/plugins/apcupsd/apcupsdctl.php "autostart"
 
 # Install powerdown plugin
 if [ -f /boot/config/plugins/powerdown-x86_64.plg ]
