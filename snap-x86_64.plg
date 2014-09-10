@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.08-1">
+<!ENTITY version   "2014.09.10">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -46,26 +46,6 @@ Filename: snap-x86_64.plg
 <MD5>54d5c31bd9b6ed66b5535a5256ef094c</MD5>
 </FILE>
 
-<FILE Name="/tmp/preSnapInstallCleanup.sh" Run="/bin/bash">
-<INLINE>
-<![CDATA[
-#!/bin/bash
-if [ -d /tmp/snap ]
-then
-	rm -r /tmp/snap
-fi
-if [ -f /tmp/prepareForSnapInstall.sh ]
-then
-	rm /tmp/prepareForSnapInstall.sh
-fi
-if [ -f /etc/rc.d/rc.snap ]
-then
-	rm /etc/rc.d/rc.snap
-fi
-]]>
-</INLINE>
-</FILE>
-
 <!--
 Prepare for snap install.
 -->
@@ -106,14 +86,6 @@ else
 	#
 	echo "snap not installed yet." >>/tmp/snap.log
 
-	if [ -d /tmp/snap ]
-	then
-		rm -r /tmp/snap
-	fi
-	if [ -f /tmp/installSnap_Code.sh ]
-	then
-		rm /tmp/installSnap_Code.sh 
-	fi
 	echo "Downloading bundle" |tee -a  /tmp/snap.log
 	
 	cd /tmp
@@ -191,6 +163,9 @@ else
 	cp /boot/config/plugins/snap/snap_web.tgz /usr/local/emhttp/plugins 2>>/dev/null
 	/usr/bin/tar -xzf snap_web.tgz 2>>/dev/null
 	rm /usr/local/emhttp/plugins/snap_web.tgz 2>>/dev/null
+
+	cd /
+	rm -r /tmp/snap
 fi
 
 # remove our jQuery from snap.php if Dynamix is running
@@ -199,6 +174,8 @@ then
 	sed -i -e 's/<script src="\/plugins\/snap\/jquery.cookie.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
 	sed -i -e 's/<script src="\/plugins\/snap\/jquery.qtip-1.0.0-rc3.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
 fi
+
+rm /tmp/prepareForSnapInstall.sh
 ]]>
 </INLINE>
 </FILE>
@@ -298,10 +275,11 @@ The 'remove' script.
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 # Stop snap.
-/etc/rc.d/rc.snap stop
-
-rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
+/etc/rc.d/rc.&name; stop
 removepkg inotify-tools
+
+rm /etc/rc.d/rc.&name;
+rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
 rm -r /usr/local/emhttp/plugins/&name;
 rm -r /boot/config/plugins/&name;
 </INLINE>
@@ -312,12 +290,10 @@ Snap start up script.
 -->
 <FILE Name="/tmp/start_snap.sh">
 <INLINE>
-<![CDATA[
-#!/bin/bash
-/etc/rc.d/rc.snap start
+# Start snap.
+/etc/rc.d/rc.&name; start
 
 rm /tmp/start_snap.sh
-]]>
 </INLINE>
 </FILE>
 
@@ -326,25 +302,13 @@ Snap install.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
-<![CDATA[
-#!/bin/bash
-if [ -f /tmp/preSnapInstallCleanup.sh ]
-then
-	rm /tmp/preSnapInstallCleanup.sh
-fi
-if [ -f /tmp/prepareForSnapInstall.sh ]
-then
-	rm /tmp/prepareForSnapInstall.sh 
-fi
-
 #
-# Start SNAP and mount any SNAP (usb) drives found.
+# Start SNAP.
 #
 echo "Starting Snap..."
 at -f/tmp/start_snap.sh now
 
 echo "Snap installation complete..."
-]]>
 </INLINE>
 </FILE>
 
