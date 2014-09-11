@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.11-1">
+<!ENTITY version   "2014.09.11-2">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -48,7 +48,7 @@ then
 	VER=$(grep "version=" /boot/config/plugins/&name;/&name;.sh | cut -d\" -f2)
 	if [ "$VER" -ne &version; ]
 	then
-		rm /boot/config/plugins/&name;/&name;.sh
+		rm -f /boot/config/plugins/&name;/&name;.sh
 	fi
 fi
 </INLINE>
@@ -340,11 +340,11 @@ It's "mode" to be executable using the Mode attribute.
 #=======================================================================================
 # Version 1.0   Authored by Dan Stroot
 #=======================================================================================
-version="2014.09.11-1"
+version="2014.09.11-2"
 PROGRAM_NAME=`basename $0`
 LOCKFILE="/var/lock/fan_speed.lck"
 CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
-SENSORFILE="/boot/config/plugins/fan_speed/sensors.sh"
+SENSORSFILE="/boot/config/plugins/fan_speed/sensors.sh"
 #=======================================================================================
 # Configuration file (will look like comment below)
 #=======================================================================================
@@ -738,9 +738,9 @@ The 'remove' script.
 # stop fan control
 /etc/rc.d/rc.&name; stop
 
-rm /etc/rc.d/rc.&name;
-rm -r /usr/local/emhttp/plugins/&name;
-rm -r /boot/config/plugins/&name;
+rm -f /etc/rc.d/rc.&name;
+rm -f -r /boot/config/plugins/&name;
+rm -f -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
