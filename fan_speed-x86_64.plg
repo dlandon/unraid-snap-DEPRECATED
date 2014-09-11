@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.11">
+<!ENTITY version   "2014.09.11-1">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -38,10 +38,26 @@ Files that will be installed:
 =======================================================================================
 -->
 
+<!--
+Prepare for installation by removing the script file.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+if [ -f /boot/config/plugins/&name;/&name;.sh ]
+then
+	VER=$(grep "version=" /boot/config/plugins/&name;/&name;.sh | cut -d\" -f2)
+	if [ "$VER" -ne &version; ]
+	then
+		rm /boot/config/plugins/&name;/&name;.sh
+	fi
+fi
+</INLINE>
+</FILE>
+
 <!-- The readme file
 HTML readme file.
 -->
-<FILE Name="/boot/config/plugins/&name;/README.html" Mode="0770">
+<FILE Name="/boot/config/plugins/&name;/README.html">
 <INLINE>
 <![CDATA[
 <!DOCTYPE html>
@@ -272,44 +288,13 @@ esac
 </INLINE>
 </FILE>
 
-<!-- The *MAIN* script
-This file defines the fan_speed script.  This is where all our script functionality lives.
-In other words this is where you main logic goes for what you want to do.  In this simple 
-example we are simply displaying a message - like all "hello world" programs.  ;)
-It's "mode" to be executable using the Mode attribute.
+<!--
+Sensors.sh file
+This file contains the sensors unique to your system.
 -->
-<FILE Name="/boot/config/plugins/&name;/&name;.sh" Mode="0770">
+<FILE Name="/boot/config/plugins/&name;/sensors.sh">
 <INLINE>
 <![CDATA[
-#!/bin/sh
-#=======================================================================================
-#  Name:	fan_speed.sh
-#=======================================================================================
-#  Description:	
-#
-#	A simple script to check for the highest hard disk temperature and then set the 
-#  	fan to an apropriate speed. Fan needs to be connected to a motherboard with pwm 
-#  	support.
-#
-#=======================================================================================
-# Version 1.0   Authored by Dan Stroot
-#=======================================================================================
-PROGRAM_NAME=`basename $0`
-LOCKFILE="/var/lock/fan_speed.lck"
-CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
-#=======================================================================================
-# Configuration file (will look like comment below)
-#=======================================================================================
-#	# fan_speed configuration
-#	SERVICE="disable"	 # Service is either enabled or disabled
-#	FAN_OFF_TEMP=32		 # Anything this number and below - fan is *off*
-#	FAN_HIGH_TEMP=38	 # Anything this number and above - fan is *full*
-#	FAN_OFF_PWM=127		 # Off Value (note: many PWM fans will not turn off)
-#	FAN_LOW_PWM=127		 # Value to make your fan go slow
-#	FAN_HIGH_PWM=195	 # Value to make your fan go fast
-#	MINUTES=5			 # The default number of minutes to loop
-#=======================================================================================
-source $CFGFILE
 #=======================================================================================
 # USER DEFINED VARIABLES: *MUST* BE SET TO *YOUR* VALUES
 #=======================================================================================
@@ -329,6 +314,54 @@ modprobe w83627ehf
 # or motherboard can't read rpm of fan.
 ARRAY_FAN=/sys/class/hwmon/hwmon1/device/pwm4				# Power (speed) setting
 ARRAY_FAN_INPUT=/sys/class/hwmon/hwmon1/device/fan4_input	# Used to track actual rpm values
+]]>
+</INLINE>
+</FILE>
+
+<!-- The *MAIN* script
+This file defines the fan_speed script.  This is where all our script functionality lives.
+In other words this is where you main logic goes for what you want to do.  In this simple 
+example we are simply displaying a message - like all "hello world" programs.  ;)
+It's "mode" to be executable using the Mode attribute.
+-->
+<FILE Name="/boot/config/plugins/&name;/&name;.sh">
+<INLINE>
+<![CDATA[
+#!/bin/sh
+#=======================================================================================
+#  Name:	fan_speed.sh
+#=======================================================================================
+#  Description:	
+#
+#	A simple script to check for the highest hard disk temperature and then set the 
+#  	fan to an apropriate speed. Fan needs to be connected to a motherboard with pwm 
+#  	support.
+#
+#=======================================================================================
+# Version 1.0   Authored by Dan Stroot
+#=======================================================================================
+version="2014.09.11-1"
+PROGRAM_NAME=`basename $0`
+LOCKFILE="/var/lock/fan_speed.lck"
+CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
+SENSORFILE="/boot/config/plugins/fan_speed/sensors.sh"
+#=======================================================================================
+# Configuration file (will look like comment below)
+#=======================================================================================
+#	# fan_speed configuration
+#	SERVICE="disable"	 # Service is either enabled or disabled
+#	FAN_OFF_TEMP=32		 # Anything this number and below - fan is *off*
+#	FAN_HIGH_TEMP=38	 # Anything this number and above - fan is *full*
+#	FAN_OFF_PWM=127		 # Off Value (note: many PWM fans will not turn off)
+#	FAN_LOW_PWM=127		 # Value to make your fan go slow
+#	FAN_HIGH_PWM=195	 # Value to make your fan go fast
+#	MINUTES=5			 # The default number of minutes to loop
+#=======================================================================================
+source $CFGFILE
+#=======================================================================================
+# Sensors file that has the unique sensors drivers.
+#=======================================================================================
+source $SENSORSFILE
 #=======================================================================================
 # PROGRAM LOGIC - CHANGE AT YOUR PERIL ;)
 #=======================================================================================
@@ -363,8 +396,6 @@ get_highest_hd_temp() {
 		SLEEPING=`hdparm -C ${HD[$CURRENT_DRIVE]} | grep -c standby`
 		if [ "$SLEEPING" -eq 0 ]; then
 			CURRENT_TEMP=`smartctl -A ${HD[$CURRENT_DRIVE]} | grep -m 1 -i Temperature | awk '{print $10}'`
-# dfl
-echo "Check drive: ${HD[$CURRENT_DRIVE]} Current temp: ${CURRENT_TEMP}" | logger -t$PROGRAM_NAME
 			if [ "$HIGHEST_TEMP" -le "$CURRENT_TEMP" ]; then
 				HIGHEST_TEMP=$CURRENT_TEMP
 				HIGHEST_TEMP_DRIVE=${HD[$CURRENT_DRIVE]}
@@ -695,7 +726,7 @@ Create plugin README.md file
 <INLINE>
 **Fan speed control**
 
-This plugin is for fan speed control.  You must load the correct divers for your motherboard.
+This plugin is for fan speed control.  You must load the correct divers for your motherboard in the /boot/config/plugins/fan_speed/sensors.sh file.
 </INLINE>
 </FILE>
 
