@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.05">
+<!ENTITY version   "2014.09.11">
 <!ENTITY category  "NTFS Write Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
@@ -51,10 +51,11 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm /boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz
+rm -f /boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz
 removepkg &name;
-rm -r /usr/local/emhttp/plugins/&name;
-rm -r /boot/config/plugins/&name;
+
+rm -f -r /usr/local/emhttp/plugins/&name;
+rm -f -r /boot/config/plugins/&name;
 </INLINE>
 </FILE>
 

@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.10">
+<!ENTITY version   "2014.09.11">
 <!ENTITY category  "Mount Non-array Disks">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
@@ -276,12 +276,13 @@ The 'remove' script.
 <INLINE>
 # Stop snap.
 /etc/rc.d/rc.&name; stop
+rm -f -r /etc/rc.d/rc.&name;
+
+rm -f -r /boot/packages/inotify-tools-3.14-x86_64-1.txz
 removepkg inotify-tools
 
-rm /etc/rc.d/rc.&name;
-rm /boot/packages/inotify-tools-3.14-x86_64-1.txz
-rm -r /usr/local/emhttp/plugins/&name;
-rm -r /boot/config/plugins/&name;
+rm -f -r /usr/local/emhttp/plugins/&name;
+rm -f -r /boot/config/plugins/&name;
 </INLINE>
 </FILE>
 
