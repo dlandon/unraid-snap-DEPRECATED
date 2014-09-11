@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.11-2">
+<!ENTITY version   "2014.09.11-3">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -43,10 +43,11 @@ Prepare for installation by removing the script file.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
-if [ -f /boot/config/plugins/&name;/&name;.sh ]
+echo "Hey yo..........................."
+if [ -f /boot/config/plugins/fan_speed/fan_speed.sh ]
 then
 	VER=$(grep "version=" /boot/config/plugins/&name;/&name;.sh | cut -d\" -f2)
-	if [ "$VER" -ne &version; ]
+	if [ "$VER" != &version; ]
 	then
 		rm -f /boot/config/plugins/&name;/&name;.sh
 	fi
@@ -340,7 +341,7 @@ It's "mode" to be executable using the Mode attribute.
 #=======================================================================================
 # Version 1.0   Authored by Dan Stroot
 #=======================================================================================
-version="2014.09.11-2"
+version="2014.09.11-3"
 PROGRAM_NAME=`basename $0`
 LOCKFILE="/var/lock/fan_speed.lck"
 CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
