@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.10-3">
+<!ENTITY version   "2014.09.11">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -362,7 +362,7 @@ get_highest_hd_temp() {
 	do
 		SLEEPING=`hdparm -C ${HD[$CURRENT_DRIVE]} | grep -c standby`
 		if [ "$SLEEPING" -eq 0 ]; then
-			CURRENT_TEMP=`smartctl -d ata -A ${HD[$CURRENT_DRIVE]} | grep -m 1 -i Temperature_Celsius | awk '{print $10}'`
+			CURRENT_TEMP=`smartctl -A ${HD[$CURRENT_DRIVE]} | grep -m 1 -i Temperature | awk '{print $10}'`
 # dfl
 echo "Check drive: ${HD[$CURRENT_DRIVE]} Current temp: ${CURRENT_TEMP}" | logger -t$PROGRAM_NAME
 			if [ "$HIGHEST_TEMP" -le "$CURRENT_TEMP" ]; then
