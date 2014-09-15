@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.11-4">
+<!ENTITY version   "2014.09.15">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -340,7 +340,7 @@ It's "mode" to be executable using the Mode attribute.
 #=======================================================================================
 # Version 1.0   Authored by Dan Stroot
 #=======================================================================================
-version="2014.09.11-4"
+version="2014.09.15"
 PROGRAM_NAME=`basename $0`
 LOCKFILE="/var/lock/fan_speed.lck"
 CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
@@ -727,6 +727,20 @@ Create plugin README.md file
 **Fan speed control**
 
 This plugin is for fan speed control.  You must load the correct divers for your motherboard in the /boot/config/plugins/fan_speed/sensors.sh file.
+</INLINE>
+</FILE>
+
+<!--
+The 'update' script.
+-->
+<FILE Run="/bin/bash" Method="update">
+<INLINE>
+# stop fan control
+/etc/rc.d/rc.&name; stop
+
+rm -f /etc/rc.d/rc.&name;
+rm -f /boot/config/plugins/&name;/&name;.sh
+rm -f -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
