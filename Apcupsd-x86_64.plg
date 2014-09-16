@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcupsd">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.11">
+<!ENTITY version   "2014.09.15">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -44,6 +44,16 @@
 The plugin provides APCUPSD support for unRAID V6.
 
 -->
+
+<!--
+Prepare for installation by removing the emhttp/plugins directory.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+rm -f -r /usr/local/emhttp/plugins/&name;
+</INLINE>
+</FILE>
+
 
 <!--
 Get the apcupsd package.
@@ -95,7 +105,7 @@ Icon.
 <![CDATA[
 Menu="OtherSettings"
 Icon="apcupsd.png"
-Version="2014.09.06"
+Version="2014.09.15"
 Author="SeeDrs"
 Type="php"
 Title="APC UPS"
