@@ -20,6 +20,15 @@ The plugin provides clean powerdown for unRAID systems.
 
 -->
 
+<!--
+Prepare for installation by removing the emhttp/plugins directory.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+rm -f -r /usr/local/emhttp/plugins/&name;
+</INLINE>
+</FILE>
+
 <FILE Name="/boot/packages/powerdown-2.08-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
 <URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.08-noarch-unRAID.tgz</URL>
 </FILE>
@@ -30,15 +39,6 @@ The plugin provides clean powerdown for unRAID systems.
 
 <FILE Name="/usr/local/emhttp/plugins/&name;/powerdown.png">
 <LOCAL>/boot/config/plugins/&name;/powerdown.png</LOCAL>
-</FILE>
-
-<!--
-Prepare for installation by removing the emhttp/plugins directory.
--->
-<FILE Run="/bin/bash">
-<INLINE>
-rm -f -r /usr/local/emhttp/plugins/&name;
-</INLINE>
 </FILE>
 
 <!--
