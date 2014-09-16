@@ -33,15 +33,11 @@ The plugin provides clean powerdown for unRAID systems.
 </FILE>
 
 <!--
-Prepare for installation by removing the script file and doing some cleanup.
+Prepare for installation by removing the emhttp/plugins directory.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
-if [ -d /usr/local/emhttp/plugins/&name; ]
-then
-	removepkg &name;
-	rm -f -r /usr/local/emhttp/plugins/&name;
-fi
+rm -f -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
