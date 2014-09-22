@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.15">
+<!ENTITY version   "2014.09.21">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -114,7 +114,7 @@ FAN_HIGH_TEMP="38"
 FAN_OFF_PWM="45"
 FAN_LOW_PWM="45"
 FAN_HIGH_PWM="165"
-MINUTES="5"
+SECONDS="10"
 ]]>
 </INLINE>
 </FILE>
@@ -153,12 +153,12 @@ and on.  Enabling the add-in means it will survive reboots, and array start and 
 #
 #  Variables passed to script:
 #	- arg1 = ACTION 	= start|stop|enable|disable
-#	- arg2 = OFF_TEMP 	= 0-99, Disk low temp in C
-#	- arg3 = HIGH_TEMP 	= 0-99, Disk high temp in C
+#	- arg2 = OFF_TEMP 	= 0-99,  Disk low temp in C
+#	- arg3 = HIGH_TEMP 	= 0-99,  Disk high temp in C
 #	- arg4 = OFF_PWM 	= 0-255, PWM setting for OFF
 #	- arg5 = LOW_PWM 	= 0-255, PWM setting for low speed
 #	- arg6 = HIGH_PWM 	= 0-255, PWM seeting for high speed
-#	- arg7 = MIN 		= 0-99, Minutes to sleep
+#	- arg7 = SEC 		= 0-999, Seconds to sleep
 #=======================================================================================
 # Version 1.0   Authored by Dan Stroot
 #=======================================================================================
@@ -186,7 +186,7 @@ write_config() {
 	echo "FAN_OFF_PWM=\"$FAN_OFF_PWM\"" >> $CFGFILE
 	echo "FAN_LOW_PWM=\"$FAN_LOW_PWM\"" >> $CFGFILE
 	echo "FAN_HIGH_PWM=\"$FAN_HIGH_PWM\"" >> $CFGFILE
-	echo "MINUTES=\"$MINUTES\"" >> $CFGFILE
+	echo "SECONDS=\"$SECONDS\"" >> $CFGFILE
 }
 fan_speed_start() {
 	if [ $SERVICE = "enable" ]; then
@@ -238,7 +238,7 @@ fan_speed_stop() {
 #	FAN_OFF_PWM=127		
 #	FAN_LOW_PWM=127		 
 #	FAN_HIGH_PWM=195	
-#	MINUTES=5
+#	SECONDS=10
 #=======================================================================================
 source $CFGFILE
 #=======================================================================================
@@ -253,7 +253,7 @@ HIGH_TEMP=$3
 OFF_PWM=$4	
 LOW_PWM=$5	 
 HIGH_PWM=$6	
-MIN=$7
+SEC=$7
 
 case "$ACTION" in
 'start')
@@ -269,7 +269,7 @@ case "$ACTION" in
   FAN_OFF_PWM=$OFF_PWM
   FAN_LOW_PWM=$LOW_PWM
   FAN_HIGH_PWM=$HIGH_PWM
-  MINUTES=$MIN
+  SECONDS=$SEC
   write_config   			# Save configuration
   fan_speed_start
   ;;
@@ -340,7 +340,7 @@ It's "mode" to be executable using the Mode attribute.
 #=======================================================================================
 # Version 1.0   Authored by Dan Stroot
 #=======================================================================================
-version="2014.09.15"
+version="2014.09.11-4"
 PROGRAM_NAME=`basename $0`
 LOCKFILE="/var/lock/fan_speed.lck"
 CFGFILE="/boot/config/plugins/fan_speed/fan_speed.cfg"
@@ -355,7 +355,7 @@ SENSORSFILE="/boot/config/plugins/fan_speed/sensors.sh"
 #	FAN_OFF_PWM=127		 # Off Value (note: many PWM fans will not turn off)
 #	FAN_LOW_PWM=127		 # Value to make your fan go slow
 #	FAN_HIGH_PWM=195	 # Value to make your fan go fast
-#	MINUTES=5			 # The default number of minutes to loop
+#	SECONDS=10			 # The default number of seconds to loop
 #=======================================================================================
 source $CFGFILE
 #=======================================================================================
@@ -483,7 +483,7 @@ do
 	get_current_fan_speed
 	calc_new_fan_speed
 	change_fan_speed
-	sleep $(($MINUTES*60))
+	sleep $SECONDS
 done &
 #=======================================================================================
 # Save the PID, disown the loop in the background
@@ -616,12 +616,12 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
    
 	The 'runCmd=Apply' tells emhttp to run the command given by 'cmd' with arguments 'arg1', 'arg2', ...
 		- arg1 = ACTION 	= enable|disable
-		- arg2 = OFF_TEMP 	= 0-99, Disk low temp in C
-		- arg3 = HIGH_TEMP 	= 0-99, Disk high temp in C
+		- arg2 = OFF_TEMP 	= 0-99,  Disk low temp in C
+		- arg3 = HIGH_TEMP 	= 0-99,  Disk high temp in C
 		- arg4 = OFF_PWM 	= 0-255, PWM setting for OFF
 		- arg5 = LOW_PWM 	= 0-255, PWM setting for low speed
 		- arg6 = HIGH_PWM 	= 0-255, PWM seeting for high speed
-		- arg7 = MIN 		= 0-99, Minutes to sleep
+		- arg7 = SEC 		= 0-999, Seconds to sleep
 	
 	The output of this command will show up in the 'progress frame' of the webpage - near the bottom.
 -->    
@@ -656,8 +656,8 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
          <td><input type="text" name="arg6" maxlength="3" value="<?=$fan_speed_cfg['FAN_HIGH_PWM'];?>"></td>
          </tr>
 		 <tr>
-         <td>How often to check (0-99 minutes):</td>
-         <td><input type="text" name="arg7" maxlength="2" value="<?=$fan_speed_cfg['MINUTES'];?>"></td>
+         <td>How often to check (0-999 seconds):</td>
+         <td><input type="text" name="arg7" maxlength="3" value="<?=$fan_speed_cfg['SECONDS'];?>"></td>
          </tr>
 		 <tr>
          <td></td>
@@ -727,20 +727,6 @@ Create plugin README.md file
 **Fan speed control**
 
 This plugin is for fan speed control.  You must load the correct divers for your motherboard in the /boot/config/plugins/fan_speed/sensors.sh file.
-</INLINE>
-</FILE>
-
-<!--
-The 'update' script.
--->
-<FILE Run="/bin/bash" Method="update">
-<INLINE>
-# stop fan control
-/etc/rc.d/rc.&name; stop
-
-rm -f /etc/rc.d/rc.&name;
-rm -f /boot/config/plugins/&name;/&name;.sh
-rm -f -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
