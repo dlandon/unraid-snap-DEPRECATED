@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcupsd">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.15">
+<!ENTITY version   "2014.09.24">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -40,6 +40,8 @@
 2014-08-31 - Updated to apcupsd 3.10.12.
 
 2014-09-05 - Updated to acpupsd 3.14.12.  Updated plugin for V6 and added several mods by dmacias.
+
+2014-09-24 - Added help.
 
 The plugin provides APCUPSD support for unRAID V6.
 
@@ -86,7 +88,7 @@ UPSTYPE="usb"
 DEVICE=""
 BATTERYLEVEL="10"
 MINUTES="10"
-TIMEOUT="300"
+TIMEOUT="3000"
 KILLUPS="NO"
 SHOWFULLSTATUS="NO"
 ]]>
@@ -260,6 +262,10 @@ Apcupsd.php.
           </select>
          </td>
          </tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Enable APC UPS Daemon:</strong>
+		 <br>Set to 'Yes' to enable apcupsd and start the daemon, set to 'No' to disable apcupsd and stop the daemon.</p>
+         </blockquote></td></tr>
+
          <tr>
          <td>UPS Cable:</td>
          <td>
@@ -275,6 +281,16 @@ Apcupsd.php.
           <input type="text" id="CUSTOMUPSCABLE" name="CUSTOMUPSCABLE" maxlength="40" value="<?=$apcupsd_cfg['CUSTOMUPSCABLE'];?>">
          </td>
          </tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>UPS Cable:</strong>
+		 <br>Defines the type of cable connecting the UPS to your computer.
+         <br><br>Possible generic choices for <cable> are:
+         <br>usb, simple, smart, network, or custom
+         <br><br>Or a specific cable model number may be used:
+         <br>940-0119A, 940-0127A, 940-0128A, 940-0020B,
+         <br>940-0020C, 940-0023A, 940-0024B, 940-0024C,
+         <br>940-1524C, 940-0024G, 940-0095A, 940-0095B,
+         <br>940-0095C, 940-0625A, M-04-02-2000</p>
+         </blockquote></td></tr>
 
          <tr>
          <td>UPS Type:</td>
@@ -290,27 +306,56 @@ Apcupsd.php.
           <input type="hidden" name="UPSTYPE" value="<?=$apcupsd_cfg['UPSTYPE'];?>">
          </td>
          </tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>UPS Type:</strong>
+		 <br>Define a 'UPS Type', which corresponds to the type of UPS you have (see the Description for more details).
+		 <br><strong>usb</strong> - Most new UPSes are USB.
+         <br><strong>apcsmart</strong> - Newer serial character device, appropriate for SmartUPS models using a serial cable (not USB).
+         <br><strong>net</strong> - Network link to a master apcupsd through apcupsd's Network Information Server. This is used if the UPS powering your computer is connected to a different computer for monitoring.
+         <br><strong>snmp</strong> - SNMP network link to an SNMP-enabled UPS device.
+		 <br><strong>dumb</strong> - Old serial character device for use with simple-signaling UPSes.
+         <br><strong>pcnet</strong> - PowerChute Network Shutdown protocol which can be used as an alternative to SNMP with the AP9617 family of smart slot cards.
+		 </blockquote></td></tr>
 
-          <tr>
+         <tr>
          <td>Device:</td>
          <td><input type="text" name="DEVICE" maxlength="40" value="<?=$apcupsd_cfg['DEVICE'];?>"></td>
          </tr>
-         
-                         <tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Device:</strong>
+		 <br><strong>usb</strong> - leave blank.
+		 <br><strong>apcsmart</strong> - /dev/tty**.
+		 <br><strong>net</strong> - hostname:port.
+		 <br><strong>snmp</strong> - hostname:port:vendor:community.  Hostname is the ip address or hostname of the UPS on the network. Vendor can be can be "APC" or "APC_NOTRAP". "APC_NOTRAP" will disable SNMP trap catching; you usually want "APC". Port is usually 161. Community is usually "private".
+		 <br><strong>dumb</strong> - /dev/tty**.
+		 <br><strong>pcnet</strong> - ipaddr:username:passphrase:port.  ipaddr is the IP address of the UPS management card. username and passphrase are the credentials for which the card has been configured. port is the port number on which to listen for messages from the UPS, normally 3052. If this parameter is empty or missing, the default of 3052 will be used.</p>
+         </blockquote></td></tr>
+
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Note:</strong> 'Battery Level', 'Minutes', and 'Timeout' work in conjunction, so the first that occurs will cause the initation of a shutdown.</p>
+         </blockquote></td></tr>
+
+         <tr>
          <td>Battery Level:</td>
          <td><input type="text" name="BATTERYLEVEL" maxlength="40" value="<?=$apcupsd_cfg['BATTERYLEVEL'];?>"></td>
          </tr>
-         
-                         <tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Battery Level:</strong>
+		 <br>If during a power failure, the remaining battery percentage (as reported by the UPS) is below or equal to 'Battery Level', apcupsd will initiate a system shutdown.</p>
+         </blockquote></td></tr>
+
+         <tr>
          <td>Minutes:</td>
          <td><input type="text" name="MINUTES" maxlength="40" value="<?=$apcupsd_cfg['MINUTES'];?>"></td>
          </tr>
-         
-                         <tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Minutes:</strong>
+		 <br>If during a power failure, the remaining runtime in minutes (as calculated internally by the UPS) is below or equal to 'Minutes', apcupsd, will initiate a system shutdown.</p>
+         </blockquote></td></tr>
+
+         <tr>
          <td>Timeout:</td>
          <td><input type="text" name="TIMEOUT" maxlength="40" value="<?=$apcupsd_cfg['TIMEOUT'];?>"></td>
          </tr>
-
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Timeout:</strong>
+		 <br>If during a power failure, the UPS has run on batteries for 'Timeout' many seconds or longer, apcupsd will initiate a system shutdown. A value of 0 disables this timer.
+         <br><br>Note, if you have a Smart UPS, you will most likely want to disable this timer by setting it to zero. That way, your UPS will continue on batteries until either the % charge remaing drops to or below 'Battery Level' or the remaining battery runtime drops to or below 'Minutes'.  Of course, if you are testing, setting this to 60 causes a quick system shutdown if you pull the power plug.  If you have an older dumb UPS, you will want to set this to less than the time you know you can run on batteries.</p>
+         </blockquote></td></tr>
          <tr>
           <td>
             Kill UPS:
@@ -324,6 +369,9 @@ Apcupsd.php.
             <input type="hidden" name="KILLUPS" value="<?=$apcupsd_cfg['KILLUPS'];?>">     
           </td>
           </tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Kill UPS:</strong>
+		 <br>Set to 'Yes' to turn off the power to the UPS after a shutdown.</p>
+         </blockquote></td></tr>
           
          <tr>
           <td>
@@ -338,8 +386,11 @@ Apcupsd.php.
             <input type="hidden" name="SHOWFULLSTATUS" value="<?=$apcupsd_cfg['SHOWFULLSTATUS'];?>">     
           </td>
           </tr>
-       
-          <tr>
+         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Show Full Status:</strong>
+		 <br>Set to 'Yes' to show full UPS status.</p>
+         </blockquote></td></tr
+
+         <tr>
          <td></td>
          <td><input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</button></td>
          </tr>
@@ -453,9 +504,9 @@ apcupsdctl.php
   date_default_timezone_set(substr(readlink("/etc/localtime-copied-from"), 20));
 
   if ($apcupsd_installing == "no")
-    $newline = "<br>";
+    $newline = "";
   else
-    $newline = "\n\r";
+    $newline = "\n";
 
   $cur_dt = date("F j\, Y h:i:s A");
   write_log("\nStart: $cur_dt");
@@ -493,6 +544,8 @@ apcupsdctl.php
   $KILLUPS=$_POST['KILLUPS'];
   $SHOWFULLSTATUS=$_POST['SHOWFULLSTATUS'];
   
+  if ($apcupsd_installing == "no")
+    readfile("/usr/local/emhttp/update.htm");
   
   switch ($CMD) {
     case 'autostart';
@@ -543,7 +596,7 @@ apcupsdctl.php
     exec_log("/etc/rc.d/rc.apcupsd start");
     sleep(5);
 
-    echo("Completed$newline");
+    echo("Completed...$newline");
 
   }
   
@@ -554,7 +607,7 @@ apcupsdctl.php
     exec_log("/etc/rc.d/rc.apcupsd stop");
     sleep(0.5);
     exec_log("killall -9 apcupsd");
-    echo("Completed$newline");
+    echo("Completed...$newline");
   }
   
   function applyconfig() {
@@ -586,7 +639,7 @@ apcupsdctl.php
     } 
     
      
-    echo("Completed$newline");  
+    echo("Completed...$newline");  
   }
   
   function saveconfig () {
@@ -603,7 +656,7 @@ apcupsdctl.php
     
     write_string($configfile, $string, TRUE);
     
-    echo("Completed$newline ");
+    echo("Completed...$newline");
   }
   
   function exec_log($cmd) {
