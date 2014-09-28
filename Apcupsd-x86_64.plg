@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcupsd">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.24">
+<!ENTITY version   "2014.09.28">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -46,6 +46,27 @@
 The plugin provides APCUPSD support for unRAID V6.
 
 -->
+
+<!--
+Wait for the network to be ready so we can download packages.
+-->
+<FILE Run="/bin/bash">
+<INLINE>
+# Wait until network is ready
+timer=60
+while [ $timer -gt 0 ]; do
+  gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
+  if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
+    break
+  fi
+  timer=$((timer-1))
+  sleep 1
+done
+if [ $timer -eq 0 ]; then
+  echo "No network communication !!!"
+fi
+</INLINE>
+</FILE>
 
 <!--
 Prepare for installation by removing the emhttp/plugins directory.
@@ -107,7 +128,7 @@ Icon.
 <![CDATA[
 Menu="OtherSettings"
 Icon="apcupsd.png"
-Version="2014.09.15"
+Version="2014.09.28"
 Author="SeeDrs"
 Type="php"
 Title="APC UPS"
