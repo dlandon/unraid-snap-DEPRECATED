@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "powerdown">
 <!ENTITY author    "WeeboTech/dlandon">
-<!ENTITY version   "2014.09.28">
+<!ENTITY version   "2014.09.30">
 <!ENTITY category  "Clean Powerdown Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
 ]>
@@ -21,27 +21,6 @@ The plugin provides clean powerdown for unRAID systems.
 -->
 
 <!--
-Wait for the network to be ready so we can download packages.
--->
-<FILE Run="/bin/bash">
-<INLINE>
-# Wait until network is ready
-timer=60
-while [ $timer -gt 0 ]; do
-  gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
-  if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
-    break
-  fi
-  timer=$((timer-1))
-  sleep 1
-done
-if [ $timer -eq 0 ]; then
-  echo "No network communication !!!"
-fi
-</INLINE>
-</FILE>
-
-<!--
 Prepare for installation by removing the emhttp/plugins directory.
 -->
 <FILE Run="/bin/bash">
@@ -50,8 +29,8 @@ rm -f -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/packages/powerdown-2.09-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.09-noarch-unRAID.tgz</URL>
+<FILE Name="/boot/packages/powerdown-2.10-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.10-noarch-unRAID.tgz</URL>
 </FILE>
 
 <FILE Name="/boot/config/plugins/&name;/powerdown.png">
@@ -67,7 +46,7 @@ Create plugin README.md file
 -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
-**Powerdown Package (2.09)**
+**Powerdown Package (2.10)**
 
 This installs the powerdown package for clean shutdown of unRAID.  Hooks are inserted in the Linux scripts for shutdown, and rebooting so unRAID will be shut down cleanly.  This prevents a parity check the next time the system is started.
 </INLINE>
@@ -78,9 +57,12 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm -f /boot/packages/powerdown-2.09-noarch-unRAID.tgz
+rm -f /boot/packages/powerdown-2.10-noarch-unRAID.tgz
 removepkg &name;
-
+if [ -f /usr/local/sbin/unraid_powerdown ]
+then
+   mv /usr/local/sbin/unraid_powerdown /usr/local/sbin/powerdown
+fi
 rm -f -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
