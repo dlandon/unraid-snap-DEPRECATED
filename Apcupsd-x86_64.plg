@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcupsd">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.28">
+<!ENTITY version   "2014.09.30">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -48,27 +48,6 @@ The plugin provides APCUPSD support for unRAID V6.
 -->
 
 <!--
-Wait for the network to be ready so we can download packages.
--->
-<FILE Run="/bin/bash">
-<INLINE>
-# Wait until network is ready
-timer=60
-while [ $timer -gt 0 ]; do
-  gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
-  if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
-    break
-  fi
-  timer=$((timer-1))
-  sleep 1
-done
-if [ $timer -eq 0 ]; then
-  echo "No network communication !!!"
-fi
-</INLINE>
-</FILE>
-
-<!--
 Prepare for installation by removing the emhttp/plugins directory.
 -->
 <FILE Run="/bin/bash">
@@ -86,12 +65,8 @@ Get the apcupsd package.
 </FILE>
 
 <!--
-Download the powerdown plugin.
+Download the plugin png.
 -->
-<FILE Name="/boot/config/plugins/powerdown-x86_64.plg">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg</URL>
-</FILE>
-
 <FILE Name="/boot/config/plugins/&name;/&name;.png">
 <URL>https://github.com/dlandon/unraid-snap/raw/master/Apcupsd.png</URL>
 </FILE>
@@ -722,7 +697,7 @@ Create plugin README.md file
 <INLINE>
 **APC UPS support**
 
-APC UPS daemon to do a clean shutdown of unRAID on a power failure.  Powerdown is included so unRAID can be shutdown cleanly.
+APC UPS daemon to do a clean shutdown of unRAID on a power failure.  Powerdown is optional and is best if you have a lot of addons that need to be stopped so unRAID can be shutdown cleanly.
 </INLINE>
 </FILE>
 
@@ -747,7 +722,7 @@ Install script.
 <INLINE>
 <![CDATA[
 # Finish APCUPSD Install
-echo "/sbin/powerdown" >/etc/apcupsd/doshutdown
+echo "/root/powerdown" >/etc/apcupsd/doshutdown
 echo "exit 99" >>/etc/apcupsd/doshutdown
 chmod 755 /etc/apcupsd/doshutdown
 
@@ -758,12 +733,6 @@ sed -i -e "s/\$0 stop/\$0 stop\n       sleep 3/" /etc/rc.d/rc.apcupsd
 
 #Start APCUPSD if enabled
 php /usr/local/emhttp/plugins/apcupsd/apcupsdctl.php "autostart"
-
-# Install powerdown plugin
-if [ -f /boot/config/plugins/powerdown-x86_64.plg ]
-then
-  /usr/local/sbin/installplg /boot/config/plugins/powerdown-x86_64.plg
-fi
 
 rm /tmp/apcupsd-install
 ]]>
