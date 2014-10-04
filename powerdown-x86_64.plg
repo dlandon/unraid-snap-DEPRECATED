@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "powerdown">
 <!ENTITY author    "WeeboTech/dlandon">
-<!ENTITY version   "2014.10.01">
+<!ENTITY version   "2014.10.04">
 <!ENTITY category  "Clean Powerdown Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
 ]>
@@ -29,8 +29,8 @@ rm -f -r /usr/local/emhttp/plugins/&name;
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/packages/powerdown-2.11-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.11-noarch-unRAID.tgz</URL>
+<FILE Name="/boot/packages/powerdown-2.12-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.12-noarch-unRAID.tgz</URL>
 </FILE>
 
 <FILE Name="/boot/config/plugins/&name;/powerdown.png">
@@ -46,7 +46,7 @@ Create plugin README.md file
 -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
-**Powerdown Package (2.11)**
+**Powerdown Package (2.12)**
 
 This installs the powerdown package for clean shutdown of unRAID.  Hooks are inserted in the Linux scripts for shutdown, and rebooting so unRAID will be shut down cleanly.  This prevents a parity check the next time the system is started.
 </INLINE>
@@ -57,7 +57,7 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm -f /boot/packages/powerdown-2.11-noarch-unRAID.tgz
+rm -f /boot/packages/powerdown-2.12-noarch-unRAID.tgz
 removepkg &name;
 if [ -f /usr/local/sbin/unraid_powerdown ]
 then
