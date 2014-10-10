@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "apcupsd">
 <!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.09.30">
+<!ENTITY version   "2014.10.09">
 <!ENTITY category  "APC UPS Support">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
@@ -249,22 +249,22 @@ Apcupsd.php.
     </p>
 
       <table class="settings">
-         <tr>
-         <td>Enable APC UPS Daemon:</td>
-         <td>
+         <dl>
+         <dt>Enable APC UPS Daemon:</dt>
+         <dd>
           <select name="SERVICE" size="1"  onChange="checkRUNNING(this.form);">
             <?=mk_option($apcupsd_cfg['SERVICE'], "disable", "No");?>
             <?=mk_option($apcupsd_cfg['SERVICE'], "enable", "Yes");?>
           </select>
-         </td>
-         </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Enable APC UPS Daemon:</strong>
+         </dd>
+         </dl>
+         <blockquote class='inline_help'><p><strong>Enable APC UPS Daemon:</strong>
 		 <br>Set to 'Yes' to enable apcupsd and start the daemon, set to 'No' to disable apcupsd and stop the daemon.</p>
-         </blockquote></td></tr>
+         </blockquote>
 
-         <tr>
-         <td>UPS Cable:</td>
-         <td>
+         <dl>
+         <dt>UPS Cable:</dt>
+         <dd>
            <select id="UPSCABLESELECT" name="UPSCABLESELECT" size="1" onChange="toggleTextBoxDisplay('UPSCABLESELECT', 'CUSTOMUPSCABLE', 'custom'); form.UPSCABLE.value = form.UPSCABLESELECT.value;">
             <?=mk_option($apcupsd_cfg['UPSCABLE'], "usb", "usb");?>
             <?=mk_option($apcupsd_cfg['UPSCABLE'], "simple", "simple");?>
@@ -275,9 +275,9 @@ Apcupsd.php.
           <input type="hidden" name="UPSCABLE" value="<?=$apcupsd_cfg['UPSCABLE'];?>">
           <br>
           <input type="text" id="CUSTOMUPSCABLE" name="CUSTOMUPSCABLE" maxlength="40" value="<?=$apcupsd_cfg['CUSTOMUPSCABLE'];?>">
-         </td>
-         </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>UPS Cable:</strong>
+         </dd>
+         </dl>
+         <blockquote class='inline_help'><p><strong>UPS Cable:</strong>
 		 <br>Defines the type of cable connecting the UPS to your computer.
          <br><br>Possible generic choices for <cable> are:
          <br>usb, simple, smart, network, or custom
@@ -286,11 +286,11 @@ Apcupsd.php.
          <br>940-0020C, 940-0023A, 940-0024B, 940-0024C,
          <br>940-1524C, 940-0024G, 940-0095A, 940-0095B,
          <br>940-0095C, 940-0625A, M-04-02-2000</p>
-         </blockquote></td></tr>
+         </blockquote>
 
-         <tr>
-         <td>UPS Type:</td>
-         <td>
+         <dl>
+         <dt>UPS Type:</dt>
+         <dd>
            <select id="UPSTYPESELECT" name="UPSTYPESELECT" size="1"" onChange="form.UPSTYPE.value = form.UPSTYPESELECT.value;">
             <?=mk_option($apcupsd_cfg['UPSTYPE'], "usb", "usb");?>
             <?=mk_option($apcupsd_cfg['UPSTYPE'], "apcsmart", "apcsmart");?>
@@ -300,9 +300,9 @@ Apcupsd.php.
             <?=mk_option($apcupsd_cfg['UPSTYPE'], "pcnet", "pcnet");?>
           </select>
           <input type="hidden" name="UPSTYPE" value="<?=$apcupsd_cfg['UPSTYPE'];?>">
-         </td>
-         </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>UPS Type:</strong>
+         </dd>
+         </dl>
+         <blockquote class='inline_help'><p><strong>UPS Type:</strong>
 		 <br>Define a 'UPS Type', which corresponds to the type of UPS you have (see the Description for more details).
 		 <br><strong>usb</strong> - Most new UPSes are USB.
          <br><strong>apcsmart</strong> - Newer serial character device, appropriate for SmartUPS models using a serial cable (not USB).
@@ -310,81 +310,76 @@ Apcupsd.php.
          <br><strong>snmp</strong> - SNMP network link to an SNMP-enabled UPS device.
 		 <br><strong>dumb</strong> - Old serial character device for use with simple-signaling UPSes.
          <br><strong>pcnet</strong> - PowerChute Network Shutdown protocol which can be used as an alternative to SNMP with the AP9617 family of smart slot cards.
-		 </blockquote></td></tr>
+		 </blockquote>
 
-         <tr>
-         <td>Device:</td>
-         <td><input type="text" name="DEVICE" maxlength="40" value="<?=$apcupsd_cfg['DEVICE'];?>"></td>
-         </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Device:</strong>
+         <dl>
+         <dt>Device:</dt>
+         <dd><input type="text" name="DEVICE" maxlength="40" value="<?=$apcupsd_cfg['DEVICE'];?>"></dd>
+         </dl>
+         <blockquote class='inline_help'><p><strong>Device:</strong>
 		 <br><strong>usb</strong> - leave blank.
 		 <br><strong>apcsmart</strong> - /dev/tty**.
 		 <br><strong>net</strong> - hostname:port.
 		 <br><strong>snmp</strong> - hostname:port:vendor:community.  Hostname is the ip address or hostname of the UPS on the network. Vendor can be can be "APC" or "APC_NOTRAP". "APC_NOTRAP" will disable SNMP trap catching; you usually want "APC". Port is usually 161. Community is usually "private".
 		 <br><strong>dumb</strong> - /dev/tty**.
 		 <br><strong>pcnet</strong> - ipaddr:username:passphrase:port.  ipaddr is the IP address of the UPS management card. username and passphrase are the credentials for which the card has been configured. port is the port number on which to listen for messages from the UPS, normally 3052. If this parameter is empty or missing, the default of 3052 will be used.</p>
-         </blockquote></td></tr>
+         </blockquote>
 
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Note:</strong> 'Battery Level', 'Minutes', and 'Timeout' work in conjunction, so the first that occurs will cause the initation of a shutdown.</p>
-         </blockquote></td></tr>
+         <blockquote class='inline_help'><p><strong>Note:</strong> 'Battery Level', 'Minutes', and 'Timeout' work in conjunction, so the first that occurs will cause the initation of a shutdown.</p>
+         </blockquote>
 
-         <tr>
-         <td>Battery Level:</td>
-         <td><input type="text" name="BATTERYLEVEL" maxlength="40" value="<?=$apcupsd_cfg['BATTERYLEVEL'];?>"></td>
-         </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Battery Level:</strong>
+         <dl>
+         <dt>Battery Level:</dt>
+         <dd><input type="text" name="BATTERYLEVEL" maxlength="40" value="<?=$apcupsd_cfg['BATTERYLEVEL'];?>"></dd>
+         </dl>
+         <blockquote class='inline_help'><p><strong>Battery Level:</strong>
 		 <br>If during a power failure, the remaining battery percentage (as reported by the UPS) is below or equal to 'Battery Level', apcupsd will initiate a system shutdown.</p>
-         </blockquote></td></tr>
+         </blockquote>
 
-         <tr>
-         <td>Minutes:</td>
-         <td><input type="text" name="MINUTES" maxlength="40" value="<?=$apcupsd_cfg['MINUTES'];?>"></td>
-         </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Minutes:</strong>
+         <dl>
+         <dt>Minutes:</dt>
+         <dd><input type="text" name="MINUTES" maxlength="40" value="<?=$apcupsd_cfg['MINUTES'];?>"></dd>
+         </dl>
+         <blockquote class='inline_help'><p><strong>Minutes:</strong>
 		 <br>If during a power failure, the remaining runtime in minutes (as calculated internally by the UPS) is below or equal to 'Minutes', apcupsd, will initiate a system shutdown.</p>
-         </blockquote></td></tr>
+         </blockquote>
 
-         <tr>
-         <td>Timeout:</td>
-         <td><input type="text" name="TIMEOUT" maxlength="40" value="<?=$apcupsd_cfg['TIMEOUT'];?>"></td>
-         </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Timeout:</strong>
+         <dl>
+         <dt>Timeout:</dt>
+         <dd><input type="text" name="TIMEOUT" maxlength="40" value="<?=$apcupsd_cfg['TIMEOUT'];?>"></dd>
+         </dl>
+         <blockquote class='inline_help'><p><strong>Timeout:</strong>
 		 <br>If during a power failure, the UPS has run on batteries for 'Timeout' many seconds or longer, apcupsd will initiate a system shutdown. A value of 0 disables this timer.
          <br><br>Note, if you have a Smart UPS, you will most likely want to disable this timer by setting it to zero. That way, your UPS will continue on batteries until either the % charge remaing drops to or below 'Battery Level' or the remaining battery runtime drops to or below 'Minutes'.  Of course, if you are testing, setting this to 60 causes a quick system shutdown if you pull the power plug.  If you have an older dumb UPS, you will want to set this to less than the time you know you can run on batteries.</p>
-         </blockquote></td></tr>
-         <tr>
-          <td>
-            Kill UPS:
-          </td>
-          
-          <td>
+         </blockquote>
+
+         <dl>
+          <dt>Kill UPS:</dt>
+          <dd>
             <select name="KILLUPSSELECT" size="1" onChange="form.KILLUPS.value = form.KILLUPSSELECT.value;">
               <?=mk_option($apcupsd_cfg['KILLUPS'], "no", "No");?>
               <?=mk_option($apcupsd_cfg['KILLUPS'], "yes", "Yes");?>
             </select>
             <input type="hidden" name="KILLUPS" value="<?=$apcupsd_cfg['KILLUPS'];?>">     
-          </td>
-          </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Kill UPS:</strong>
+          </dd>
+          </dl>
+         <blockquote class='inline_help'><p><strong>Kill UPS:</strong>
 		 <br>Set to 'Yes' to turn off the power to the UPS after a shutdown.</p>
-         </blockquote></td></tr>
-          
-         <tr>
-          <td>
-            Show Full Status:
-          </td>
-          
-          <td>
+         </blockquote>
+
+         <dl>
+          <dt>Show Full Status:</dt>
+          <dd>
             <select id="SHOWFULLSTATUSSELECT" name="SHOWFULLSTATUSSELECT" size="1" onChange="form.SHOWFULLSTATUS.value = form.SHOWFULLSTATUSSELECT.value; toggleDivDisplay('SHOWFULLSTATUSSELECT', 'FULLUPSSTATUS', 'no');">
               <?=mk_option($apcupsd_cfg['SHOWFULLSTATUS'], "no", "No");?>
               <?=mk_option($apcupsd_cfg['SHOWFULLSTATUS'], "yes", "Yes");?>
             </select>
             <input type="hidden" name="SHOWFULLSTATUS" value="<?=$apcupsd_cfg['SHOWFULLSTATUS'];?>">     
-          </td>
-          </tr>
-         <tr class='tr_row0 inline_help'><td colspan='11'><blockquote class='inline_help'><p><strong>Show Full Status:</strong>
+          </dd>
+          </dl>
+         <blockquote class='inline_help'><p><strong>Show Full Status:</strong>
 		 <br>Set to 'Yes' to show full UPS status.</p>
-         </blockquote></td></tr
+         </blockquote>
 
          <tr>
          <td></td>
