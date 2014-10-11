@@ -1,11 +1,12 @@
 <?xml version='1.0' standalone='yes'?>
 
 <!DOCTYPE PLUGIN [
-<!ENTITY name      "apcupsd">
-<!ENTITY author    "seeDrs/dlandon">
-<!ENTITY version   "2014.10.09">
-<!ENTITY category  "APC UPS Support">
-<!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
+<!ENTITY name       "apcupsd">
+<!ENTITY author     "seeDrs/dlandon">
+<!ENTITY version    "2014.10.11">
+<!ENTITY category   "APC UPS Support">
+<!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
+<!ENTITY pkgversion "3.14.12">
 ]>
 
 <PLUGIN  name="&name;"
@@ -43,32 +44,43 @@
 
 2014-09-24 - Added help.
 
+2014-10-11 - Built download bundle and moved the php and other files to a tar bundle.
+
 The plugin provides APCUPSD support for unRAID V6.
 
 -->
 
 <!--
-Prepare for installation by removing the emhttp/plugins directory.
+Get the apcupsd bundle.
 -->
-<FILE Run="/bin/bash">
-<INLINE>
-rm -f -r /usr/local/emhttp/plugins/&name;
-</INLINE>
+<FILE Name="/boot/config/plugins/&name;/&name;-&version;.tgz">
+<URL>"https://github.com/dlandon/unraid-snap/raw/master/&name;-&version;.tgz"</URL>
 </FILE>
-
 
 <!--
 Get the apcupsd package.
 -->
-<FILE Name="/boot/packages/apcupsd-3.14.12-x86_64-4.tgz" Run="upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/apcupsd-3.14.12-x86_64-4.tgz</URL>
+<FILE Name="/boot/packages/apcupsd-&pkgversion;-x86_64-4.tgz" Run="upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/apcupsd-&pkgversion;-x86_64-4.tgz</URL>
 </FILE>
 
 <!--
-Download the plugin png.
+Prepare for installation.
 -->
-<FILE Name="/boot/config/plugins/&name;/&name;.png">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/Apcupsd.png</URL>
+<FILE Run="/bin/bash">
+<INLINE>
+# Remove emhttp files so we can re-install.
+rm -f -r /usr/local/emhttp/plugins/&name;
+
+# Remove old 'package' files.
+rm -f $(ls /boot/packages/&name;*.tgz 2>/dev/null | grep -v '&pkgversion;')
+
+# Remove old 'bundle' files.
+rm -f $(ls /boot/config/plugins/&name;/&name;*.tgz 2>/dev/null | grep -v '&version;')
+
+# Install the 'bundle'.
+tar -xf /boot/config/plugins/&name;/&name;-&version;.tgz -C /usr/local/emhttp/plugins
+</INLINE>
 </FILE>
 
 <!--
@@ -76,7 +88,6 @@ Create the default configuration file.
 -->
 <FILE Name="/boot/config/plugins/&name;/&name;.cfg">
 <INLINE>
-<![CDATA[
 # apcupsd configuration
 SERVICE="disable"
 UPSCABLE="usb"
@@ -87,612 +98,6 @@ MINUTES="10"
 TIMEOUT="3000"
 KILLUPS="NO"
 SHOWFULLSTATUS="NO"
-]]>
-</INLINE>
-</FILE>
-
-<!--
-Icon.
--->
-<FILE Name="/usr/local/emhttp/plugins/&name;/&name;.png">
-<LOCAL>/boot/config/plugins/&name;/&name;.png</LOCAL>
-</FILE>
-
-<FILE Name="/usr/local/emhttp/plugins/&name;/Apcupsd.page">
-<INLINE>
-<![CDATA[
-Menu="OtherSettings"
-Icon="apcupsd.png"
-Version="2014.09.28"
-Author="SeeDrs"
-Type="php"
-Title="APC UPS"
-]]>
-</INLINE>
-</FILE>
-
-<!--
-Apcupsd.php.
--->
-<FILE Name="/usr/local/emhttp/plugins/&name;/Apcupsd.php">
-<INLINE>
-<![CDATA[
-<?PHP
-  $apcupsd_cfg = parse_ini_file( "/boot/config/plugins/apcupsd/apcupsd.cfg");
-  $apcupsd_running = file_exists( "/var/run/apcupsd.pid") ? "yes" : "no";
-
-  $status="";
-  $bcharge="";
-  $timeleft="";
-  
-  if ($apcupsd_running=="yes") {
-    $apcaccessoutput=`/sbin/apcaccess`;
-   
-    if ($apcaccessoutput != "")
-    {
-      //status
-      $statusstartpos = strpos($apcaccessoutput, "STATUS   :") + 11;
-      $statusendpos = strpos($apcaccessoutput, "\n", $statusstartpos) -1;
-      $status = substr($apcaccessoutput, $statusstartpos, $statusendpos-$statusstartpos);
-      
-      //bcharge
-      $bchargestartpos = strpos($apcaccessoutput, "BCHARGE  :") +11;
-      $bchargeendpos = strpos($apcaccessoutput, "\n", $bchargestartpos);
-      $bcharge = substr($apcaccessoutput, $bchargestartpos, $bchargeendpos-$bchargestartpos);
-      $bcharge = str_replace(" Percent", "", $bcharge);
-      $bchargecolour = (round($bcharge) <= 10 ? 'red' : 'green');
- 
-      //timeleft
-      $timeleftstartpos = strpos($apcaccessoutput, "TIMELEFT :") +11;
-      $timeleftendpos = strpos($apcaccessoutput, "\n", $timeleftstartpos);
-      $timeleft = substr($apcaccessoutput, $timeleftstartpos, $timeleftendpos-$timeleftstartpos);
-      $timeleftint = preg_replace('/[^0-9\.]/', '', $timeleft);
-      $timeleftcolour = (round($timeleft) <= 5 ? 'red' : 'green');
-
-      //loadpct
-      $loadpctstartpos = strpos($apcaccessoutput, "LOADPCT  :") +11;
-      $loadpctendpos = strpos($apcaccessoutput, "\n", $loadpctstartpos);
-      $loadpct = substr($apcaccessoutput, $loadpctstartpos, $loadpctendpos-$loadpctstartpos);
-      $loadpctint = preg_replace('/[^0-9\.]/', '', $loadpct);
-
-      //nompower
-      $nompowerstartpos = strpos($apcaccessoutput, "NOMPOWER :") +11;
-      $nompowerendpos = strpos($apcaccessoutput, "\n", $nompowerstartpos);
-      $nompower = substr($apcaccessoutput, $nompowerstartpos, $nompowerendpos-$nompowerstartpos);
-      $nompowerint = preg_replace('/[^0-9\.]/', '', $nompower);
-      
-      //load
-      if ($nompowerstartpos != "11")
-      {
-       $load=($loadpctint/100)*$nompowerint;
-       $loadcolour='green';
-      }
-      else 
-      {
-       $load="N/A";
-       $loadcolour='red';
-      }
-      $load .= " Watts";
-     }     
-  }
-  
-
-?>
-
-<style>
-.green {
-	color: #6FA239;
-	font-size: 14px;
-}
-.red {
-	color: #CC3300;
-	font-size: 14px;
-}
-.status_head {
-	font-size: 14px;
-	font-weight: bold;
-}
-</style>
-   <br />
-   <form name="apcupsd_settings" method="POST" action="/plugins/apcupsd/apcupsdctl.php" target="progressFrame">
-      <input type="hidden" name="cmd" value="apply">
-       <table>
-         <tr>
-          <td>
-            <span class="status_head">Daemon: </span><?=($apcupsd_running=="yes")?"<span class=\"green\">Running</span>":"<span class=\"red\">Stopped</span>";?>
-          </td>
-          <td>
-            <span class="status_head">UPS: </span>
-            <?PHP
-                switch ($status) {
-                  case '':
-                    if ($apcupsd_running=="yes")
-                      echo("<span class=\"red\">Unknown</span>");
-                    else
-                      echo("<span class=\"red\">Offline</span>");
-                    break;
-                   case 'ONLINE':
-                    echo("<span class=\"green\">Online</span>");
-                    break;
-                  case 'ONBATT':
-                     echo("<span class=\"red\">On Battery</span>");
-                    break;
-                  case 'COMMLOST':
-                    echo("<span class=\"red\">Lost Communication</span>");
-                    break;
-                  case 'NOBATT':
-                    echo("<span class=\"red\">No Battery Detected</span>");
-                    break;
-                  default:
-                    echo("<span class=\"red\">$status</span>");
-                    break;
-                 }
-            ?>      
-          </td>
-          <td>
-            <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Battery Charge: </span><span class="<?=$bchargecolour;?>"><?=$bcharge;?>%</span><? endif; ?>
-          </td>
-          <td>
-             <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Time Left: </span><span class="<?=$timeleftcolour;?>"><?=$timeleft;?></span><? endif; ?>
-          </td>
-          <td>
-             <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Load: </span><span class="<?=$loadcolour;?>"><?=$load;?></span><? endif; ?>
-          </td>
-          <td>
-             <? if ($status=="ONLINE" || $status=="ONBATT"): ?><span class="status_head">Load %: </span><span class="<?=$loadcolour;?>"><?=$loadpct;?></span><? endif; ?>
-          </td>
-         </tr>
-       </table>
-
-    <p  class=ContentTitle>
-        <span class="left">Settings</span>
-    </p>
-
-      <table class="settings">
-         <dl>
-         <dt>Enable APC UPS Daemon:</dt>
-         <dd>
-          <select name="SERVICE" size="1"  onChange="checkRUNNING(this.form);">
-            <?=mk_option($apcupsd_cfg['SERVICE'], "disable", "No");?>
-            <?=mk_option($apcupsd_cfg['SERVICE'], "enable", "Yes");?>
-          </select>
-         </dd>
-         </dl>
-         <blockquote class='inline_help'><p><strong>Enable APC UPS Daemon:</strong>
-		 <br>Set to 'Yes' to enable apcupsd and start the daemon, set to 'No' to disable apcupsd and stop the daemon.</p>
-         </blockquote>
-
-         <dl>
-         <dt>UPS Cable:</dt>
-         <dd>
-           <select id="UPSCABLESELECT" name="UPSCABLESELECT" size="1" onChange="toggleTextBoxDisplay('UPSCABLESELECT', 'CUSTOMUPSCABLE', 'custom'); form.UPSCABLE.value = form.UPSCABLESELECT.value;">
-            <?=mk_option($apcupsd_cfg['UPSCABLE'], "usb", "usb");?>
-            <?=mk_option($apcupsd_cfg['UPSCABLE'], "simple", "simple");?>
-            <?=mk_option($apcupsd_cfg['UPSCABLE'], "smart", "smart");?>
-            <?=mk_option($apcupsd_cfg['UPSCABLE'], "ether", "network");?>
-            <?=mk_option($apcupsd_cfg['UPSCABLE'], "custom", "custom");?>
-          </select>
-          <input type="hidden" name="UPSCABLE" value="<?=$apcupsd_cfg['UPSCABLE'];?>">
-          <br>
-          <input type="text" id="CUSTOMUPSCABLE" name="CUSTOMUPSCABLE" maxlength="40" value="<?=$apcupsd_cfg['CUSTOMUPSCABLE'];?>">
-         </dd>
-         </dl>
-         <blockquote class='inline_help'><p><strong>UPS Cable:</strong>
-		 <br>Defines the type of cable connecting the UPS to your computer.
-         <br><br>Possible generic choices for <cable> are:
-         <br>usb, simple, smart, network, or custom
-         <br><br>Or a specific cable model number may be used:
-         <br>940-0119A, 940-0127A, 940-0128A, 940-0020B,
-         <br>940-0020C, 940-0023A, 940-0024B, 940-0024C,
-         <br>940-1524C, 940-0024G, 940-0095A, 940-0095B,
-         <br>940-0095C, 940-0625A, M-04-02-2000</p>
-         </blockquote>
-
-         <dl>
-         <dt>UPS Type:</dt>
-         <dd>
-           <select id="UPSTYPESELECT" name="UPSTYPESELECT" size="1"" onChange="form.UPSTYPE.value = form.UPSTYPESELECT.value;">
-            <?=mk_option($apcupsd_cfg['UPSTYPE'], "usb", "usb");?>
-            <?=mk_option($apcupsd_cfg['UPSTYPE'], "apcsmart", "apcsmart");?>
-            <?=mk_option($apcupsd_cfg['UPSTYPE'], "net", "network");?>
-            <?=mk_option($apcupsd_cfg['UPSTYPE'], "snmp", "snmp");?>
-            <?=mk_option($apcupsd_cfg['UPSTYPE'], "dumb", "dumb");?>
-            <?=mk_option($apcupsd_cfg['UPSTYPE'], "pcnet", "pcnet");?>
-          </select>
-          <input type="hidden" name="UPSTYPE" value="<?=$apcupsd_cfg['UPSTYPE'];?>">
-         </dd>
-         </dl>
-         <blockquote class='inline_help'><p><strong>UPS Type:</strong>
-		 <br>Define a 'UPS Type', which corresponds to the type of UPS you have (see the Description for more details).
-		 <br><strong>usb</strong> - Most new UPSes are USB.
-         <br><strong>apcsmart</strong> - Newer serial character device, appropriate for SmartUPS models using a serial cable (not USB).
-         <br><strong>net</strong> - Network link to a master apcupsd through apcupsd's Network Information Server. This is used if the UPS powering your computer is connected to a different computer for monitoring.
-         <br><strong>snmp</strong> - SNMP network link to an SNMP-enabled UPS device.
-		 <br><strong>dumb</strong> - Old serial character device for use with simple-signaling UPSes.
-         <br><strong>pcnet</strong> - PowerChute Network Shutdown protocol which can be used as an alternative to SNMP with the AP9617 family of smart slot cards.
-		 </blockquote>
-
-         <dl>
-         <dt>Device:</dt>
-         <dd><input type="text" name="DEVICE" maxlength="40" value="<?=$apcupsd_cfg['DEVICE'];?>"></dd>
-         </dl>
-         <blockquote class='inline_help'><p><strong>Device:</strong>
-		 <br><strong>usb</strong> - leave blank.
-		 <br><strong>apcsmart</strong> - /dev/tty**.
-		 <br><strong>net</strong> - hostname:port.
-		 <br><strong>snmp</strong> - hostname:port:vendor:community.  Hostname is the ip address or hostname of the UPS on the network. Vendor can be can be "APC" or "APC_NOTRAP". "APC_NOTRAP" will disable SNMP trap catching; you usually want "APC". Port is usually 161. Community is usually "private".
-		 <br><strong>dumb</strong> - /dev/tty**.
-		 <br><strong>pcnet</strong> - ipaddr:username:passphrase:port.  ipaddr is the IP address of the UPS management card. username and passphrase are the credentials for which the card has been configured. port is the port number on which to listen for messages from the UPS, normally 3052. If this parameter is empty or missing, the default of 3052 will be used.</p>
-         </blockquote>
-
-         <blockquote class='inline_help'><p><strong>Note:</strong> 'Battery Level', 'Minutes', and 'Timeout' work in conjunction, so the first that occurs will cause the initation of a shutdown.</p>
-         </blockquote>
-
-         <dl>
-         <dt>Battery Level:</dt>
-         <dd><input type="text" name="BATTERYLEVEL" maxlength="40" value="<?=$apcupsd_cfg['BATTERYLEVEL'];?>"></dd>
-         </dl>
-         <blockquote class='inline_help'><p><strong>Battery Level:</strong>
-		 <br>If during a power failure, the remaining battery percentage (as reported by the UPS) is below or equal to 'Battery Level', apcupsd will initiate a system shutdown.</p>
-         </blockquote>
-
-         <dl>
-         <dt>Minutes:</dt>
-         <dd><input type="text" name="MINUTES" maxlength="40" value="<?=$apcupsd_cfg['MINUTES'];?>"></dd>
-         </dl>
-         <blockquote class='inline_help'><p><strong>Minutes:</strong>
-		 <br>If during a power failure, the remaining runtime in minutes (as calculated internally by the UPS) is below or equal to 'Minutes', apcupsd, will initiate a system shutdown.</p>
-         </blockquote>
-
-         <dl>
-         <dt>Timeout:</dt>
-         <dd><input type="text" name="TIMEOUT" maxlength="40" value="<?=$apcupsd_cfg['TIMEOUT'];?>"></dd>
-         </dl>
-         <blockquote class='inline_help'><p><strong>Timeout:</strong>
-		 <br>If during a power failure, the UPS has run on batteries for 'Timeout' many seconds or longer, apcupsd will initiate a system shutdown. A value of 0 disables this timer.
-         <br><br>Note, if you have a Smart UPS, you will most likely want to disable this timer by setting it to zero. That way, your UPS will continue on batteries until either the % charge remaing drops to or below 'Battery Level' or the remaining battery runtime drops to or below 'Minutes'.  Of course, if you are testing, setting this to 60 causes a quick system shutdown if you pull the power plug.  If you have an older dumb UPS, you will want to set this to less than the time you know you can run on batteries.</p>
-         </blockquote>
-
-         <dl>
-          <dt>Kill UPS:</dt>
-          <dd>
-            <select name="KILLUPSSELECT" size="1" onChange="form.KILLUPS.value = form.KILLUPSSELECT.value;">
-              <?=mk_option($apcupsd_cfg['KILLUPS'], "no", "No");?>
-              <?=mk_option($apcupsd_cfg['KILLUPS'], "yes", "Yes");?>
-            </select>
-            <input type="hidden" name="KILLUPS" value="<?=$apcupsd_cfg['KILLUPS'];?>">     
-          </dd>
-          </dl>
-         <blockquote class='inline_help'><p><strong>Kill UPS:</strong>
-		 <br>Set to 'Yes' to turn off the power to the UPS after a shutdown.</p>
-         </blockquote>
-
-         <dl>
-          <dt>Show Full Status:</dt>
-          <dd>
-            <select id="SHOWFULLSTATUSSELECT" name="SHOWFULLSTATUSSELECT" size="1" onChange="form.SHOWFULLSTATUS.value = form.SHOWFULLSTATUSSELECT.value; toggleDivDisplay('SHOWFULLSTATUSSELECT', 'FULLUPSSTATUS', 'no');">
-              <?=mk_option($apcupsd_cfg['SHOWFULLSTATUS'], "no", "No");?>
-              <?=mk_option($apcupsd_cfg['SHOWFULLSTATUS'], "yes", "Yes");?>
-            </select>
-            <input type="hidden" name="SHOWFULLSTATUS" value="<?=$apcupsd_cfg['SHOWFULLSTATUS'];?>">     
-          </dd>
-          </dl>
-         <blockquote class='inline_help'><p><strong>Show Full Status:</strong>
-		 <br>Set to 'Yes' to show full UPS status.</p>
-         </blockquote>
-
-         <tr>
-         <td></td>
-         <td><input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</button></td>
-         </tr>
-      </table>
-   </form>
-     <hr>
-
-  <div id="FULLUPSSTATUS">
-  <?PHP
-     if ($apcupsd_running=="yes") {
-        
-       $lines = split("\n", $apcaccessoutput);
-       
-       echo("<p class=ContentTitle>APC UPS Status</p>");
-       echo("<table  class=\"settings\">");
-       echo("</tr>");
-       
-       
-       foreach ($lines as $line) {
-          echo("<tr>");          
-            // echo("$line<br>");
-             $pos = strpos($line, ":");
-            
-            if ($pos !== false){
-              $right = trim(substr($line, 0, $pos));
-              $left = trim(substr($line,$pos+2));
-              echo("<td>"); 
-              echo($right);
-              echo("</td>"); 
-              echo("<td>"); 
-              echo($left);
-              echo("</td>"); 
-            }
-            else {
-              echo("<td>"); 
-              echo($line);
-              echo("</td>"); 
-            }
-          echo("</tr>");          
-       }
-         
-       echo("</table>");   
-     }
-  ?>
-</div>
-<script type="text/javascript">
-function checkRUNNING(form)
-{
-   if ("<?=$apcupsd_running;?>" == "yes")
-       readOnlyForm(form, true);
-   else
-       readOnlyForm(form, form.SERVICE.value == "enable");
-}
-
-function readOnlyForm(form, isReadOnly) {
-
-    form.UPSCABLESELECT.disabled = isReadOnly;
-    form.CUSTOMUPSCABLE.readOnly = isReadOnly;
-    form.UPSTYPESELECT.disabled = isReadOnly;
-    form.DEVICE.readOnly = isReadOnly;
-    form.BATTERYLEVEL.readOnly = isReadOnly;
-    form.MINUTES.readOnly = isReadOnly;
-    form.TIMEOUT.readOnly = isReadOnly;
-    form.KILLUPSSELECT.disabled = isReadOnly;
-}
-
-function toggleTextBoxDisplay(ddlID, tboxID, hidevalue ) { 
-  if (document.getElementById(ddlID).value == hidevalue) {
-    document.getElementById(tboxID).style.display="block";
-    document.getElementById(ddlID).focus();
-  }
-  else {
-    document.getElementById(tboxID).style.display="none";
-    document.getElementById(tboxID).focus();
-  }
-}
-
-function toggleDivDisplay(ddlID, divID, hidevalue) { 
-  if (document.getElementById(ddlID).value == hidevalue) 
-    document.getElementById(divID).style.visibility = 'hidden';
-  else 
-    document.getElementById(divID).style.visibility = 'visible';
- }
-
-
-toggleDivDisplay('SHOWFULLSTATUSSELECT', 'FULLUPSSTATUS', 'no');
-
-toggleTextBoxDisplay('UPSCABLESELECT', 'CUSTOMUPSCABLE', 'custom');
-
-checkRUNNING(document.apcupsd_settings);
-document.apcupsd_settings.form.UPSTYPE.value = document.apcupsd_settings.form.UPSUPSTYPESELECT.value;
-document.apcupsd_settings.form.UPSCABLE.value = document.apcupsd_settings.form.UPSCABLESELECT.value;
-document.apcupsd_settings.form.KILLUPS.value = document.apcupsd_settings.form.KILLUPSSELECT.value;
-document.apcupsd_settings.form.SHOWFULLSTATUS.value = document.apcupsd_settings.form.SHOWFULLSTATUSSELECT.value;
-</script>
-
-]]>
-</INLINE>
-</FILE>
-
-<!--
-apcupsdctl.php
--->
-<FILE Name="/usr/local/emhttp/plugins/&name;/apcupsdctl.php">
-<INLINE>
-<![CDATA[
-<?PHP
-  $logfile = "/var/log/apcupsd";
-  $configfile = "/boot/config/plugins/apcupsd/apcupsd.cfg";
-  $apcupsd_installing = file_exists( "/tmp/apcupsd-install") ? "yes" : "no";
-  date_default_timezone_set(substr(readlink("/etc/localtime-copied-from"), 20));
-
-  if ($apcupsd_installing == "no")
-    $newline = "";
-  else
-    $newline = "\n";
-
-  $cur_dt = date("F j\, Y h:i:s A");
-  write_log("\nStart: $cur_dt");
-  
-  $settings = array(
-    "SERVICE",
-    "UPSCABLE",
-    "CUSTOMUPSCABLE",
-    "UPSTYPE",
-    "DEVICE",
-    "BATTERYLEVEL",
-    "MINUTES",
-    "TIMEOUT",
-    "KILLUPS",
-    "SHOWFULLSTATUS"
-  );
-
-  if ($argv[1] == "autostart") {
-    $CMD = $argv[1];
-  } else {
-    $CMD = $_POST['cmd'];
-  }
-
-  if ($CMD  == "autostart")
-    $_POST = parse_ini_file( "/boot/config/plugins/apcupsd/apcupsd.cfg");
-  
-  $SERVICE=$_POST['SERVICE'];
-  $UPSCABLE=$_POST['UPSCABLE'];
-  $CUSTOMUPSCABLE=$_POST['CUSTOMUPSCABLE'];
-  $UPSTYPE=$_POST['UPSTYPE'];
-  $DEVICE=$_POST['DEVICE'];
-  $BATTERYLEVEL=$_POST['BATTERYLEVEL'];
-  $MINUTES=$_POST['MINUTES'];
-  $TIMEOUT=$_POST['TIMEOUT'];
-  $KILLUPS=$_POST['KILLUPS'];
-  $SHOWFULLSTATUS=$_POST['SHOWFULLSTATUS'];
-  
-  if ($apcupsd_installing == "no")
-    readfile("/usr/local/emhttp/update.htm");
-  
-  switch ($CMD) {
-    case 'autostart';
-    case 'apply':
-      saveconfig();
-      
-      if ($SERVICE == "enable") {
-        applyconfig();
-        startapcupsd();
-      }
-      else
-        stopapcupsd();
-      break;
-     case 'start':
-      break;
-    case 'stop':
-      break;
-    case 'enable':
-      break;
-    case 'disable':
-      break;
-    default:
-    break;
-  }
-
-  /* Fix by dfl for log rotation issue.
-     If the plugin is installing don't allow this html code to be echoed.  This code during initial
-     startup would fire off the fatal log rotation problem.  It appears to do a constant refresh of
-	 the log file.  It is intended to refresh the apc ups daemon plugin screen. */
-  if ($apcupsd_installing == "no") {
-    echo("<html>");
-    echo("<head><script>var goback=parent.location;</script></head>");
-    echo("<body onLoad=\"parent.location=goback;\"></body>");
-    echo("</html>");
-  }
-  
-  $cur_dt = date("F j\, Y h:i:s A");
-  write_log("\nEnd: $cur_dt");
-  
-  function startapcupsd() {
-    global $newline, $log;
-
-    echo("Starting apcupsd...");
-
-    exec_log("/etc/rc.d/rc.apcupsd stop");
-    sleep(0.5);
-    exec_log("killall -9 apcupsd");
-    exec_log("/etc/rc.d/rc.apcupsd start");
-    sleep(5);
-
-    echo("Completed...$newline");
-
-  }
-  
-  function stopapcupsd() {
-    global $newline, $log;
-
-    echo("Stopping apcupsd...");
-    exec_log("/etc/rc.d/rc.apcupsd stop");
-    sleep(0.5);
-    exec_log("killall -9 apcupsd");
-    echo("Completed...$newline");
-  }
-  
-  function applyconfig() {
-    echo("Applying Settings...");
-  
-    global $SERVICE, $UPSCABLE, $CUSTOMUPSCABLE, $UPSTYPE, $DEVICE, $BATTERYLEVEL, $MINUTES, $TIMEOUT, $KILLUPS, $newline, $log;
-
-  if ($UPSCABLE == "custom")
-    exec_log("sed -i -e '/^UPSCABLE/c\\UPSCABLE '$CUSTOMUPSCABLE'' /etc/apcupsd/apcupsd.conf");
-  else
-    exec_log("sed -i -e '/^UPSCABLE/c\\UPSCABLE '$UPSCABLE'' /etc/apcupsd/apcupsd.conf");
-
-    exec_log("sed -i -e '/^UPSTYPE/c\\UPSTYPE '$UPSTYPE'' /etc/apcupsd/apcupsd.conf");
-
-    exec_log("sed -i -e '/^DEVICE/c\\DEVICE '$DEVICE'' /etc/apcupsd/apcupsd.conf");
-
-    exec_log("! grep -q apccontrol /etc/rc.d/rc.6 && sed -i -e 's/\\/sbin\\/poweroff/\\/etc\\/apcupsd\\/apccontrol killpower; \\/sbin\\/poweroff/' /etc/rc.d/rc.6");
-
-    exec_log("sed -i -e '/^BATTERYLEVEL/c\\BATTERYLEVEL '$BATTERYLEVEL'' /etc/apcupsd/apcupsd.conf");
-    exec_log("sed -i -e '/^MINUTES/c\\MINUTES '$MINUTES'' /etc/apcupsd/apcupsd.conf");
-    exec_log("sed -i -e '/^TIMEOUT/c\\TIMEOUT '$TIMEOUT'' /etc/apcupsd/apcupsd.conf");
-     
-    if ($KILLUPS == "yes") {
-      exec_log("! grep -q apccontrol /etc/rc.d/rc.6 && sed -i -e 's/\\/sbin\\/poweroff/\\/etc\\/apcupsd\\/apccontrol killpower; \\/sbin\\/poweroff/' /etc/rc.d/rc.6");
-    }
-    else
-    {
-      exec_log("grep -q apccontrol /etc/rc.d/rc.6 && sed -i -e 's/\\/etc\\/apcupsd\\/apccontrol killpower; \\/sbin\\/poweroff/\\/sbin\\/poweroff/' /etc/rc.d/rc.6");
-    } 
-    
-     
-    echo("Completed...$newline");  
-  }
-  
-  function saveconfig () {
-    echo("Saving Settings...");
-    global $_POST, $configfile, $settings, $newline;
-
-    $string .= "#apcupsd configuration\n";
-
-    foreach ($_POST as $key=>$value) {
-      if (in_array($key, $settings)) {
-        $string .= "$key=\"$value\"\n";
-      }
-    }
-    
-    write_string($configfile, $string, TRUE);
-    
-    echo("Completed...$newline");
-  }
-  
-  function exec_log($cmd) {
-
-    $results = exec("$cmd 2>/dev/null");
-    
-    $results = "\nCMD: $cmd \nResults: $results";
-    write_log($results);
-  }
-
-  function write_log($contents) {
-    global $logfile;
-    write_string($logfile, "$contents\n", FALSE);
-  }
-    
-  function write_string ($file, $contents, $overwrite) {
-    if (file_exists($file)) {
-      if ($overwrite)
-          unlink($file);
-          touch($file);
-    }
-    else {
-      touch($file);
-    }
-    
-    $fp = @fopen($file, 'a');
-    @flock($fp, LOCK_EX);
-    @fwrite($fp, $contents);
-    @flock($fp, LOCK_UN);
-    @fclose($fp);
-  }
-  
-?>
-]]>
-</INLINE>
-</FILE>
-
-<!--
-Create plugin README.md file
--->
-<FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
-<INLINE>
-**APC UPS support**
-
-APC UPS daemon to do a clean shutdown of unRAID on a power failure.  Powerdown is optional and is best if you have a lot of addons that need to be stopped so unRAID can be shutdown cleanly.
 </INLINE>
 </FILE>
 
@@ -701,8 +106,9 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm -f /boot/packages/apcupsd-3.14.12-x86_64-4.tgz
-removepkg apcupsd
+rm -f /boot/packages/apcupsd-&pkgversion;-x86_64-4.tgz
+removepkg &name;
+rm -f /etc/rc.d/rc.&name;
 
 rm -f -r /usr/local/emhttp/plugins/&name;
 rm -f -r /boot/config/plugins/&name;
@@ -715,22 +121,20 @@ Install script.
 -->
 <FILE Name="/tmp/apcupsd-install" Run="/bin/bash">
 <INLINE>
-<![CDATA[
 # Finish APCUPSD Install
-echo "/root/powerdown" >/etc/apcupsd/doshutdown
-echo "exit 99" >>/etc/apcupsd/doshutdown
-chmod 755 /etc/apcupsd/doshutdown
+echo "/root/powerdown" >/etc/&name;/doshutdown
+echo "exit 99" >>/etc/&name;/doshutdown
+chmod 755 /etc/&name;/doshutdown
 
-sed -i -e "/^WALL=wall/c\WALL=\"mail -s 'unRAID_Server_UPS_Alert' root\"/" /etc/apcupsd/apccontrol
+sed -i -e "/^WALL=wall/c\WALL=\"mail -s 'unRAID_Server_UPS_Alert' root\"/" /etc/&name;/apccontrol
 
 #Fatal pid log rotation error fix
-sed -i -e "s/\$0 stop/\$0 stop\n       sleep 3/" /etc/rc.d/rc.apcupsd
+sed -i -e "s/\$0 stop/\$0 stop\n       sleep 3/" /etc/rc.d/rc.&name;
 
 #Start APCUPSD if enabled
-php /usr/local/emhttp/plugins/apcupsd/apcupsdctl.php "autostart"
+php /usr/local/emhttp/plugins/&name;/apcupsdctl.php "autostart"
 
 rm /tmp/apcupsd-install
-]]>
 </INLINE>
 </FILE>
 
