@@ -1,11 +1,12 @@
 <?xml version='1.0' standalone='yes'?>
 
 <!DOCTYPE PLUGIN [
-<!ENTITY name      "powerdown">
-<!ENTITY author    "WeeboTech/dlandon">
-<!ENTITY version   "2014.10.04">
-<!ENTITY category  "Clean Powerdown Support">
-<!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
+<!ENTITY name       "powerdown">
+<!ENTITY author     "WeeboTech/dlandon">
+<!ENTITY version    "2014.10.11">
+<!ENTITY category   "Clean Powerdown Support">
+<!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
+<!ENTITY pkgversion "2.12">
 ]>
 
 <PLUGIN  name="&name;"
@@ -21,20 +22,30 @@ The plugin provides clean powerdown for unRAID systems.
 -->
 
 <!--
-Prepare for installation by removing the emhttp/plugins directory.
+Get the package.
+-->
+<FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
+</FILE>
+
+<!--
+Get the icon.
+-->
+<FILE Name="/boot/config/plugins/&name;/powerdown.png">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown.png</URL>
+</FILE>
+
+<!--
+Prepare for installation.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
+# Remove emhttp files so we can re-install.
 rm -f -r /usr/local/emhttp/plugins/&name;
+
+# Remove old 'package' files.
+rm -f $(ls /boot/packages/&name;*.tgz 2>/dev/null | grep -v '&pkgversion;')
 </INLINE>
-</FILE>
-
-<FILE Name="/boot/packages/powerdown-2.12-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-2.12-noarch-unRAID.tgz</URL>
-</FILE>
-
-<FILE Name="/boot/config/plugins/&name;/powerdown.png">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown.png</URL>
 </FILE>
 
 <FILE Name="/usr/local/emhttp/plugins/&name;/powerdown.png">
@@ -46,7 +57,7 @@ Create plugin README.md file
 -->
 <FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
 <INLINE>
-**Powerdown Package (2.12)**
+**Powerdown Package (&pkgversion;)**
 
 This installs the powerdown package for clean shutdown of unRAID.  Hooks are inserted in the Linux scripts for shutdown, and rebooting so unRAID will be shut down cleanly.  This prevents a parity check the next time the system is started.
 </INLINE>
@@ -57,7 +68,7 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm -f /boot/packages/powerdown-2.12-noarch-unRAID.tgz
+rm -f /boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz
 removepkg &name;
 if [ -f /usr/local/sbin/unraid_powerdown ]
 then
