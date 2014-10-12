@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "powerdown">
 <!ENTITY author     "WeeboTech/dlandon">
-<!ENTITY version    "2014.10.11">
+<!ENTITY version    "2014.10.12">
 <!ENTITY category   "Clean Powerdown Support">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
 <!ENTITY pkgversion "2.12">
@@ -22,17 +22,16 @@ The plugin provides clean powerdown for unRAID systems.
 -->
 
 <!--
-Get the package.
+Get the powerdown bundle.
 -->
-<FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
+<FILE Name="/boot/config/plugins/&name;/&name;-&version;.tgz">
+<URL>"https://github.com/dlandon/unraid-snap/raw/master/&name;-&version;.tgz"</URL>
 </FILE>
 
 <!--
-Get the icon.
+Get the package.
 -->
-<FILE Name="/boot/config/plugins/&name;/powerdown.png">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown.png</URL>
+<FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new"><URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
 </FILE>
 
 <!--
@@ -45,21 +44,12 @@ rm -f -r /usr/local/emhttp/plugins/&name;
 
 # Remove old 'package' files.
 rm -f $(ls /boot/packages/&name;*.tgz 2>/dev/null | grep -v '&pkgversion;')
-</INLINE>
-</FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/&name;/powerdown.png">
-<LOCAL>/boot/config/plugins/&name;/powerdown.png</LOCAL>
-</FILE>
+# Remove old 'bundle' files.
+rm -f $(ls /boot/config/plugins/&name;/&name;*.tgz 2>/dev/null | grep -v '&version;')
 
-<!--
-Create plugin README.md file
--->
-<FILE Name="/usr/local/emhttp/plugins/&name;/README.md">
-<INLINE>
-**Powerdown Package (&pkgversion;)**
-
-This installs the powerdown package for clean shutdown of unRAID.  Hooks are inserted in the Linux scripts for shutdown, and rebooting so unRAID will be shut down cleanly.  This prevents a parity check the next time the system is started.
+# Install the 'bundle'.
+tar -xf /boot/config/plugins/&name;/&name;-&version;.tgz -C /usr/local/emhttp/plugins
 </INLINE>
 </FILE>
 
@@ -70,11 +60,16 @@ The 'remove' script.
 <INLINE>
 rm -f /boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz
 removepkg &name;
+
+# Put back the unRAID powerdown.
 if [ -f /usr/local/sbin/unraid_powerdown ]
 then
    mv /usr/local/sbin/unraid_powerdown /usr/local/sbin/powerdown
 fi
+
+# Remove all plugin files.
 rm -f -r /usr/local/emhttp/plugins/&name;
+rm -f -r /boot/config/plugins/&name;
 </INLINE>
 </FILE>
 

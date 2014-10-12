@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
 <!ENTITY author     "seeDrs/dlandon">
-<!ENTITY version    "2014.10.11">
+<!ENTITY version    "2014.10.12">
 <!ENTITY category   "APC UPS Support">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 <!ENTITY pkgversion "3.14.12">
@@ -102,14 +102,32 @@ SHOWFULLSTATUS="NO"
 </FILE>
 
 <!--
+Shutdown script.
+-->
+<FILE Name="/etc/&name;/doshutdown" Mode="744">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/root/powerdown
+exit 99
+]]>
+</INLINE>
+</FILE>
+
+<!--
 The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 rm -f /boot/packages/apcupsd-&pkgversion;-x86_64-4.tgz
 removepkg &name;
+
+# Clean up package remains.
+rm -f -r /etc/&name;
+rm -f /etc/logrotate.d/&name;
 rm -f /etc/rc.d/rc.&name;
 
+# Remove all plugin files.
 rm -f -r /usr/local/emhttp/plugins/&name;
 rm -f -r /boot/config/plugins/&name;
 rm -f -r /var/log/&name;
@@ -121,17 +139,13 @@ Install script.
 -->
 <FILE Name="/tmp/apcupsd-install" Run="/bin/bash">
 <INLINE>
-# Finish APCUPSD Install
-echo "/root/powerdown" >/etc/&name;/doshutdown
-echo "exit 99" >>/etc/&name;/doshutdown
-chmod 755 /etc/&name;/doshutdown
-
+# Finish APCUPSD Install.
 sed -i -e "/^WALL=wall/c\WALL=\"mail -s 'unRAID_Server_UPS_Alert' root\"/" /etc/&name;/apccontrol
 
-#Fatal pid log rotation error fix
+# Fatal pid log rotation error fix.
 sed -i -e "s/\$0 stop/\$0 stop\n       sleep 3/" /etc/rc.d/rc.&name;
 
-#Start APCUPSD if enabled
+# Start APCUPSD if enabled.
 php /usr/local/emhttp/plugins/&name;/apcupsdctl.php "autostart"
 
 rm /tmp/apcupsd-install
