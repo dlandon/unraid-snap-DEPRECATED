@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.21">
+<!ENTITY version   "2014.10.23">
 <!ENTITY category  "Fan Speed Control">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
@@ -114,7 +114,7 @@ FAN_HIGH_TEMP="38"
 FAN_OFF_PWM="45"
 FAN_LOW_PWM="45"
 FAN_HIGH_PWM="165"
-SECONDS="10"
+MINUTES="5"
 ]]>
 </INLINE>
 </FILE>
@@ -153,12 +153,12 @@ and on.  Enabling the add-in means it will survive reboots, and array start and 
 #
 #  Variables passed to script:
 #	- arg1 = ACTION 	= start|stop|enable|disable
-#	- arg2 = OFF_TEMP 	= 0-99,  Disk low temp in C
-#	- arg3 = HIGH_TEMP 	= 0-99,  Disk high temp in C
+#	- arg2 = OFF_TEMP 	= 0-99, Disk low temp in C
+#	- arg3 = HIGH_TEMP 	= 0-99, Disk high temp in C
 #	- arg4 = OFF_PWM 	= 0-255, PWM setting for OFF
 #	- arg5 = LOW_PWM 	= 0-255, PWM setting for low speed
 #	- arg6 = HIGH_PWM 	= 0-255, PWM seeting for high speed
-#	- arg7 = SEC 		= 0-999, Seconds to sleep
+#	- arg7 = MIN 		= 0-99, Minutes to sleep
 #=======================================================================================
 # Version 1.0   Authored by Dan Stroot
 #=======================================================================================
@@ -186,7 +186,7 @@ write_config() {
 	echo "FAN_OFF_PWM=\"$FAN_OFF_PWM\"" >> $CFGFILE
 	echo "FAN_LOW_PWM=\"$FAN_LOW_PWM\"" >> $CFGFILE
 	echo "FAN_HIGH_PWM=\"$FAN_HIGH_PWM\"" >> $CFGFILE
-	echo "SECONDS=\"$SECONDS\"" >> $CFGFILE
+	echo "MINUTES=\"$MINUTES\"" >> $CFGFILE
 }
 fan_speed_start() {
 	if [ $SERVICE = "enable" ]; then
@@ -238,7 +238,7 @@ fan_speed_stop() {
 #	FAN_OFF_PWM=127		
 #	FAN_LOW_PWM=127		 
 #	FAN_HIGH_PWM=195	
-#	SECONDS=10
+#	MINUTES=5
 #=======================================================================================
 source $CFGFILE
 #=======================================================================================
@@ -253,7 +253,7 @@ HIGH_TEMP=$3
 OFF_PWM=$4	
 LOW_PWM=$5	 
 HIGH_PWM=$6	
-SEC=$7
+MIN=$7
 
 case "$ACTION" in
 'start')
@@ -269,7 +269,7 @@ case "$ACTION" in
   FAN_OFF_PWM=$OFF_PWM
   FAN_LOW_PWM=$LOW_PWM
   FAN_HIGH_PWM=$HIGH_PWM
-  SECONDS=$SEC
+  MINUTES=$MIN
   write_config   			# Save configuration
   fan_speed_start
   ;;
@@ -355,7 +355,7 @@ SENSORSFILE="/boot/config/plugins/fan_speed/sensors.sh"
 #	FAN_OFF_PWM=127		 # Off Value (note: many PWM fans will not turn off)
 #	FAN_LOW_PWM=127		 # Value to make your fan go slow
 #	FAN_HIGH_PWM=195	 # Value to make your fan go fast
-#	SECONDS=10			 # The default number of seconds to loop
+#	MINUTES=5			 # The default number of minutes to loop
 #=======================================================================================
 source $CFGFILE
 #=======================================================================================
@@ -483,7 +483,7 @@ do
 	get_current_fan_speed
 	calc_new_fan_speed
 	change_fan_speed
-	sleep $SECONDS
+	sleep $(($MINUTES*60))
 done &
 #=======================================================================================
 # Save the PID, disown the loop in the background
@@ -616,12 +616,12 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
    
 	The 'runCmd=Apply' tells emhttp to run the command given by 'cmd' with arguments 'arg1', 'arg2', ...
 		- arg1 = ACTION 	= enable|disable
-		- arg2 = OFF_TEMP 	= 0-99,  Disk low temp in C
-		- arg3 = HIGH_TEMP 	= 0-99,  Disk high temp in C
+		- arg2 = OFF_TEMP 	= 0-99, Disk low temp in C
+		- arg3 = HIGH_TEMP 	= 0-99, Disk high temp in C
 		- arg4 = OFF_PWM 	= 0-255, PWM setting for OFF
 		- arg5 = LOW_PWM 	= 0-255, PWM setting for low speed
 		- arg6 = HIGH_PWM 	= 0-255, PWM seeting for high speed
-		- arg7 = SEC 		= 0-999, Seconds to sleep
+		- arg7 = MIN 		= 0-99, Minutes to sleep
 	
 	The output of this command will show up in the 'progress frame' of the webpage - near the bottom.
 -->    
@@ -629,7 +629,7 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
       <input type="hidden" name="cmd" value="/etc/rc.d/rc.fan_speed">
       <table class="settings">
          <tr>
-         <td>Enable Fan Speed:</td>
+         <td>Enable Fan Speed Control:</td>
          <td><select name="arg1" size="1"  onChange="activateAPPLYBTN(this.form);">
             <?=mk_option($fan_speed_cfg['SERVICE'], "disable", "No");?>
             <?=mk_option($fan_speed_cfg['SERVICE'], "enable", "Yes");?>
@@ -644,20 +644,20 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
          <td><input type="text" name="arg3" maxlength="2" value="<?=$fan_speed_cfg['FAN_HIGH_TEMP'];?>"></td>
          </tr>
 		 <tr>
-         <td>PWM Off Setting (0-255):</td>
+         <td>Fan Idle PWM Setting (0-255):</td>
          <td><input type="text" name="arg4" maxlength="3" value="<?=$fan_speed_cfg['FAN_OFF_PWM'];?>"></td>
          </tr>
 		 <tr>
-         <td>PWM Low Setting (0-255):</td>
+         <td>Fan Low PWM Setting (0-255):</td>
          <td><input type="text" name="arg5" maxlength="3" value="<?=$fan_speed_cfg['FAN_LOW_PWM'];?>"></td>
          </tr>
 		 <tr>
-         <td>PWM High Setting (0-255):</td>
+         <td>Fan High PWM Setting (0-255):</td>
          <td><input type="text" name="arg6" maxlength="3" value="<?=$fan_speed_cfg['FAN_HIGH_PWM'];?>"></td>
          </tr>
 		 <tr>
          <td>How often to check (0-999 seconds):</td>
-         <td><input type="text" name="arg7" maxlength="3" value="<?=$fan_speed_cfg['SECONDS'];?>"></td>
+         <td><input type="text" name="arg7" maxlength="2" value="<?=$fan_speed_cfg['MINUTES'];?>"></td>
          </tr>
 		 <tr>
          <td></td>
@@ -726,7 +726,7 @@ Create plugin README.md file
 <INLINE>
 **Fan speed control**
 
-This plugin is for fan speed control.  You must load the correct divers for your motherboard in the /boot/config/plugins/fan_speed/sensors.sh file.
+This plugin is for fan speed control.  You must load the correct divers for your motherboard in the sensors.sh file located on the flash drive at /boot/config/plugins/fan_speed/.
 </INLINE>
 </FILE>
 
