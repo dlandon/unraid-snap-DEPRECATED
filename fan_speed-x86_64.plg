@@ -577,7 +577,7 @@ The page file defines which menu page the plugin will appear on.
 <INLINE>
 <![CDATA[
 Author="Daniel Stroot"
-Title="Fan Control"
+Title="Fan Speed Control"
 Menu="OtherSettings"
 Icon="fan_speed.png"
 Version="1.0"
@@ -657,7 +657,7 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
          </tr>
 		 <tr>
          <td>How often to check (0-999 seconds):</td>
-         <td><input type="text" name="arg7" maxlength="2" value="<?=$fan_speed_cfg['MINUTES'];?>"></td>
+         <td><input type="text" name="arg7" maxlength="3" value="<?=$fan_speed_cfg['MINUTES'];?>"></td>
          </tr>
 		 <tr>
          <td></td>
@@ -667,7 +667,7 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
    </form>
 <? if ($fan_speed_running=="yes"): ?>
     <hr>
-	<p class=ContentTitle>Fan Control is running!</p>
+	<p class=ContentTitle>Fan Speed Control is running!</p>
 <? endif; ?>
 	<p><a href="/boot/config/plugins/fan_speed/README.html" target="_blank">Readme</a></p>
 	
