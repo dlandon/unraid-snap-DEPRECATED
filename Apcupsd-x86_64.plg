@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
 <!ENTITY author     "seeDrs/dlandon">
-<!ENTITY version    "2014.10.12">
+<!ENTITY version    "2014.10.29">
 <!ENTITY category   "APC UPS Support">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 <!ENTITY pkgversion "3.14.12">
