@@ -3,8 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "powerdown">
 <!ENTITY author     "WeeboTech/dlandon">
-<!ENTITY version    "2014.10.12">
-<!ENTITY category   "Clean Powerdown Support">
+<!ENTITY version    "2014.11.23">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
 <!ENTITY pkgversion "2.12">
 ]>
@@ -12,7 +11,6 @@
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
-         category="&category;"
          pluginURL="&pluginURL;">
 
 <!--
@@ -26,12 +24,6 @@ Get the powerdown bundle.
 -->
 <FILE Name="/boot/config/plugins/&name;/&name;-&version;.tgz">
 <URL>"https://github.com/dlandon/unraid-snap/raw/master/&name;-&version;.tgz"</URL>
-</FILE>
-
-<!--
-Get the package.
--->
-<FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new"><URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
 </FILE>
 
 <!--
@@ -51,6 +43,13 @@ rm -f $(ls /boot/config/plugins/&name;/&name;*.tgz 2>/dev/null | grep -v '&versi
 # Install the 'bundle'.
 tar -xf /boot/config/plugins/&name;/&name;-&version;.tgz -C /usr/local/emhttp/plugins
 </INLINE>
+</FILE>
+
+<!--
+Get the package.
+-->
+<FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
 </FILE>
 
 <!--
