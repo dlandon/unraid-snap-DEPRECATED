@@ -3,9 +3,9 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "powerdown">
 <!ENTITY author     "WeeboTech/dlandon">
-<!ENTITY version    "2014.11.23">
+<!ENTITY version    "2014.11.24">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
-<!ENTITY pkgversion "2.12">
+<!ENTITY pkgversion "2.13">
 ]>
 
 <PLUGIN  name="&name;"
@@ -27,12 +27,19 @@ Get the powerdown bundle.
 </FILE>
 
 <!--
+Get the package.
+-->
+<FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
+<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
+</FILE>
+
+<!--
 Prepare for installation.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
 # Remove emhttp files so we can re-install.
-rm -f -r /usr/local/emhttp/plugins/&name;
+rm /usr/local/emhttp/plugins/&name;/* 2>/dev/null
 
 # Remove old 'package' files.
 rm -f $(ls /boot/packages/&name;*.tgz 2>/dev/null | grep -v '&pkgversion;')
@@ -46,18 +53,17 @@ tar -xf /boot/config/plugins/&name;/&name;-&version;.tgz -C /usr/local/emhttp/pl
 </FILE>
 
 <!--
-Get the package.
--->
-<FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
-</FILE>
-
-<!--
 The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
+# Remove all plugin files.
+rm -f -r /usr/local/emhttp/plugins/&name;
+rm -f -r /boot/config/plugins/&name;
+
+# Remove the powerdown package.
 rm -f /boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz
+rm -f -r /etc/rc.d/rc.unRAID.d/*
 removepkg &name;
 
 # Put back the unRAID powerdown.
@@ -65,10 +71,6 @@ if [ -f /usr/local/sbin/unraid_powerdown ]
 then
    mv /usr/local/sbin/unraid_powerdown /usr/local/sbin/powerdown
 fi
-
-# Remove all plugin files.
-rm -f -r /usr/local/emhttp/plugins/&name;
-rm -f -r /boot/config/plugins/&name;
 </INLINE>
 </FILE>
 
