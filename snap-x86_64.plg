@@ -93,7 +93,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-6.03.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-6.04.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
