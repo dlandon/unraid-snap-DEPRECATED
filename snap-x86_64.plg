@@ -3,15 +3,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.09.11">
-<!ENTITY category  "Mount Non-array Disks">
+<!ENTITY version   "2014.11.30">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
 
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
-         category="&category;"
          pluginURL="&pluginURL;">
 
 <!--
@@ -174,6 +172,7 @@ then
 	sed -i -e 's/<script src="\/plugins\/snap\/jquery.cookie.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
 	sed -i -e 's/<script src="\/plugins\/snap\/jquery.qtip-1.0.0-rc3.min.js" type="text\/javascript"><\/script>/ /' /usr/local/emhttp/plugins/snap/snap.php
 fi
+chmod 755 /usr/local/emhttp/plugins/snap -R
 
 rm /tmp/prepareForSnapInstall.sh
 ]]>
@@ -198,6 +197,7 @@ snap_start()
 
 snap_stop()
 {   
+	/boot/config/plugins/snap/snap.sh -unmountAll
 	/boot/config/plugins/snap/snapNotify.sh *stop*
 	/boot/config/plugins/snap/snapSambaNotify.sh *stop*
 	/boot/config/plugins/snap/snap.sh -disable
