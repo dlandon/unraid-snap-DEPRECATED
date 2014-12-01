@@ -3,15 +3,13 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.10.23">
-<!ENTITY category  "Fan Speed Control">
+<!ENTITY version   "2014.11.30">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
 
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
-         category="&category;"
          pluginURL="&pluginURL;">
 
 <!--
@@ -581,7 +579,11 @@ Title="Fan Speed Control"
 Menu="OtherSettings"
 Icon="fan_speed.png"
 Version="1.0"
-Type="php"
+
+---
+<?php
+shell_exec('php /usr/local/emhttp/plugins/&name;/Fan_speed.php');
+?>
 ]]>
 </INLINE>
 </FILE>
