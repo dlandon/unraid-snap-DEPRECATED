@@ -582,7 +582,7 @@ Version="1.0"
 
 ---
 <?php
-shell_exec('php /usr/local/emhttp/plugins/&name;/Fan_speed.php');
+shell_exec('php /usr/local/emhttp/plugins/fan_speed/Fan_speed.php');
 ?>
 ]]>
 </INLINE>
