@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
 <!ENTITY author     "seeDrs/dlandon">
-<!ENTITY version    "2014.12.01">
+<!ENTITY version    "2014.12.05">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 <!ENTITY pkgversion "3.14.12">
 ]>
@@ -43,6 +43,8 @@
 2014-09-24 - Added help.
 
 2014-10-11 - Built download bundle and moved the php and other files to a tar bundle.
+
+2014-12-05 - Made changes for dynamix compatibility.  Cleaned up some code.  Added status.
 
 The plugin provides APCUPSD support for unRAID V6.
 
