@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
 <!ENTITY author     "seeDrs/dlandon">
-<!ENTITY version    "2014.12.05a">
+<!ENTITY version    "2014.12.06">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 <!ENTITY pkgversion "3.14.12">
 ]>
@@ -14,40 +14,9 @@
          pluginURL="&pluginURL;">
 
 <!--
-2011-09-30 - first release
-
-2011-10-02 - changed icon to show up under network services
-
-2011-10-04 - Added apcaccess output to page with service is running
-
-2011-10-05 - Fixed versioning and updated package cleanup
-
-2011-10-11 - Updated to apcupsd 3.14.10, converted apply script to php and allowed for more options/configuration
-
-2011-10-12 - 2atv-Beta1, implented slimmed down status info on top of screen. Needs some formatting/css work. Added abilited to show/hide full ups status
-
-2011-10-12 - 2atv-Beta2, Added abilited to show/hide full ups status
-
-2011-10-16 - Added coloring to status info on top of page, thanks to speeding_ant
-
-2013-07-16 - Riot - Changed package urls to RLWorkman's version and added alternate in case that one goes down (thanks mace5805) added zoggy's fix for the fatal pid log rotation error http://lime-technology.com/forum/index.php?topic=16537.0 (thanks zoggy) Changed name to reflect changed package version. All other code thanks to SeeDrs.
-
-2013-09-28 - Made some corrections to stop the syslog log refresh issue.
-
-2014-01-24 - Modified for unRAID ver 6.0 (64bit).  Added logic to wait for network to be ready.
-
-2014-08-31 - Updated to apcupsd 3.10.12.
-
-2014-09-05 - Updated to acpupsd 3.14.12.  Updated plugin for V6 and added several mods by dmacias.
-
-2014-09-24 - Added help.
-
-2014-10-11 - Built download bundle and moved the php and other files to a tar bundle.
-
-2014-12-05 - Made changes for dynamix compatibility.  Cleaned up some code.  Added status.
-
-The plugin provides APCUPSD support for unRAID V6.
-
+Copyright 2014, by Dan Landon
+This plugin provides APCUPSD support for unRAID V6.  The plugin was modified from the original
+work done by seeDrs.
 -->
 
 <!--
@@ -97,7 +66,6 @@ BATTERYLEVEL="10"
 MINUTES="10"
 TIMEOUT="3000"
 KILLUPS="NO"
-SHOWFULLSTATUS="NO"
 </INLINE>
 </FILE>
 
@@ -119,7 +87,11 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm -f /boot/packages/apcupsd-&pkgversion;-x86_64-4.tgz
+# Stop apcupsd
+/etc/rc.d/rc.&name; stop
+
+# Remove the apcupsd package
+rm -f /boot/packages/&name;-&pkgversion;-x86_64-4.tgz
 removepkg &name;
 
 # Clean up package remains.
@@ -140,7 +112,7 @@ Install script.
 <FILE Name="/tmp/apcupsd-install" Run="/bin/bash">
 <INLINE>
 # Finish APCUPSD Install.
-sed -i -e "/^WALL=wall/c\WALL=\"mail -s 'unRAID_Server_UPS_Alert' root\"/" /etc/&name;/apccontrol
+sed -i -e "/^WALL=wall/c\WALL=\"/usr/local/emhttp/plugins/apcupsd/apcupsd.notify"\" /etc/&name;/apccontrol
 
 # Fatal pid log rotation error fix.
 sed -i -e "s/\$0 stop/\$0 stop\n       sleep 3/" /etc/rc.d/rc.&name;
