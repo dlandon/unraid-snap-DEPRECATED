@@ -13,6 +13,29 @@
          version="&version;"
          pluginURL="&pluginURL;">
 
+<CHANGES>
+###2014-12-07a
+- Revised field descriptions again to try to be as clear as possible.
+
+###2014-12-07
+- Revised plugin web page to manage optional fields and prevent invalid field values from being passed to the apcupsd daemon when not used.
+- Modified field descriptions and help.  Default 'Timeout' is now zero.
+- Minor code clean up for readability.
+
+###2014-12-06
+- Changed the UPS settings so they can be done without stopping the UPS daemon first.
+- Added unRAID notify so UPS events will be emailed and a notification shown on the webgui.
+
+###2014-12-05a
+- Changed web page to dynamix tabbed style.
+
+###2014.11.30
+- Changed menu file structure to be compatible with beta 12.
+
+###2014.10.29
+- Initial unRAID V6 release.
+</CHANGES>
+
 <!--
 Copyright 2014, by Dan Landon
 This plugin provides APCUPSD support for unRAID V6.  The plugin was modified from the original
