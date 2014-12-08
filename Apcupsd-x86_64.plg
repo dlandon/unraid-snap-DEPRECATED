@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
 <!ENTITY author     "seeDrs/dlandon">
-<!ENTITY version    "2014.12.07a">
+<!ENTITY version    "2014.12.08">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 <!ENTITY pkgversion "3.14.12">
 ]>
@@ -14,23 +14,28 @@
          pluginURL="&pluginURL;">
 
 <CHANGES>
-###2014-12-07a
+###2014.12.08
+- Added a button to link to the online apcupsd manual.
+- Added boost and trim status.
+- Reformatted UPS status output.
+
+###2014.12.07a
 - Revised field descriptions again to try to be as clear as possible.
 
-###2014-12-07
+###2014.12.07
 - Revised plugin web page to manage optional fields and prevent invalid field values from being passed to the apcupsd daemon when not used.
-- Modified field descriptions and help.  Default 'Timeout' is now zero.
+- Modified field descriptions and help.  Default 'Timeout' is now set to zero.
 - Minor code clean up for readability.
 
-###2014-12-06
-- Changed the UPS settings so they can be done without stopping the UPS daemon first.
-- Added unRAID notify so UPS events will be emailed and a notification shown on the webgui.
+###2014.12.06
+- Changed the UPS settings so they can be changed without stopping the UPS daemon first.
+- Added unRAID notify so UPS events will be emailed and notifications shown on the webgui.
 
-###2014-12-05a
+###2014.12.05a
 - Changed web page to dynamix tabbed style.
 
 ###2014.11.30
-- Changed menu file structure to be compatible with beta 12.
+- Changed menu file structure to be compatible with V6b12.
 
 ###2014.10.29
 - Initial unRAID V6 release.
