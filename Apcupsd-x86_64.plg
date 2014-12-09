@@ -2,8 +2,8 @@
 
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
-<!ENTITY author     "seeDrs/dlandon">
-<!ENTITY version    "2014.12.08">
+<!ENTITY author     "dlandon">
+<!ENTITY version    "2014.12.09">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 <!ENTITY pkgversion "3.14.12">
 ]>
@@ -14,6 +14,9 @@
          pluginURL="&pluginURL;">
 
 <CHANGES>
+###2014.12.09
+- Changed numeric input fields to narrow.
+
 ###2014.12.08
 - Added a button to link to the online apcupsd manual.
 - Added boost and trim status.
