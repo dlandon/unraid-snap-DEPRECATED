@@ -2,15 +2,25 @@
 
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
-<!ENTITY author    "Queeg/dlandon">
-<!ENTITY version   "2014.11.30">
+<!ENTITY author    "dlandon">
+<!ENTITY version   "2014.12.17">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
+<!ENTITY snapver	"6.05"
 ]>
 
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
          pluginURL="&pluginURL;">
+
+<CHANGES>
+###6.05
+- Changes for Dynamix compatibility.
+- Added help.
+
+###6.04
+- Initial unRAID V6 release.
+</CHANGES>
 
 <!--
 Copyright (C) 2010-2014, Dave Lewis or Queegtech.com
@@ -93,7 +103,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-6.04.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-&snapver;.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
