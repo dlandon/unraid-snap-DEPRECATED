@@ -5,7 +5,6 @@
 <!ENTITY author    "dlandon">
 <!ENTITY version   "2014.12.17">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
-<!ENTITY snapver	"6.05">
 ]>
 
 <PLUGIN  name="&name;"
@@ -103,7 +102,7 @@ else
 	#
 	# Download the bundle.
 	#
-	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-&snapver;.tar
+	wget -t2 -q -O /tmp/snap/snapBundle.tar https://github.com/dlandon/unraid-snap/raw/master/snap-6.05.tar
 	echo "Bundle downloaded" >>/tmp/snap.log
 	cd /tmp/snap
 
