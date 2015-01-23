@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.11.30">
+<!ENTITY version   "2015.01.23">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
 
@@ -27,8 +27,7 @@ Files that will be installed:
   /usr/local/emhttp/plugins/fan_speed/fan_speed.png				# local icon file
   /boot/config/plugins/fan_speed/fan_speed.cfg					# plugin configuration file
   /boot/config/plugins/fan_speed/fan_speed.sh					# main script
-  /usr/local/emhttp/plugins/fan_speed/Fan_speed.page    		# page file for webGui menu system
-  /usr/local/emhttp/plugins/fan_speed/Fan_speed.php				# webGui page code
+  /usr/local/emhttp/plugins/fan_speed/Fan_speed.page    		# page file for webGui menu and page code
   /usr/local/emhttp/plugins/fan_speed/event/disks_mounted		# mount event handler
   /usr/local/emhttp/plugins/fan_speed/event/unmounting_disks	# unmount event handler
   /tmp/fan_speed-install										# install script
@@ -568,35 +567,6 @@ stopped
 <!-- UnRaid GUI files 
 These files are required to hook the plugin into the unRaid webGui menu system 
 -->
-<!-- UnRaid Menu
-The page file defines which menu page the plugin will appear on.
--->
-<FILE Name="/usr/local/emhttp/plugins/&name;/Fan_speed.page">
-<INLINE>
-<![CDATA[
-Author="Daniel Stroot"
-Title="Fan Speed Control"
-Menu="OtherSettings"
-Icon="fan_speed.png"
-Version="1.0"
-
----
-<?php
-shell_exec('php /usr/local/emhttp/plugins/fan_speed/Fan_speed.php');
-?>
-]]>
-</INLINE>
-</FILE>
-
-<!-- Icon File
-This is the icon displayed in the webGui. We use a LOCAL element here to specify that the icon
-file may be found and copied from the local file system.  This is the icon file we downloaded
-previously.  The reason we do this is that the unRaid webGui directory is reinitialized upon each
-reboot, and using a LOCAL file is faster and more reliable than re-downloaded every time.
--->
-<FILE Name="/usr/local/emhttp/plugins/&name;/&name;.png">
-<LOCAL>/boot/config/plugins/&name;/&name;.png</LOCAL>
-</FILE>
 
 <!-- Php file
 Here is the PHP code for the fan_speed webGui configuration page.  This is a simple page that
@@ -604,10 +574,15 @@ defines a couple controls for the user and indicates whether fan_speed is runnin
 illustrates the method by which the control script can be invoked by emhttp, and the use of javascript
 to dynamically enable/disable form elements.
 -->
-<FILE Name="/usr/local/emhttp/plugins/&name;/Fan_speed.php">
+<FILE Name="/usr/local/emhttp/plugins/&name;/Fan_speed.page">
 <INLINE>
 <![CDATA[
-<?PHP
+Title="Fan Speed Control"
+Menu="OtherSettings"
+Icon="fan_speed.png"
+Version="1.0"
+---
+<?php
 $fan_speed_cfg = parse_ini_file( "/boot/config/plugins/fan_speed/fan_speed.cfg");
 $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
 ?>
@@ -639,27 +614,27 @@ $fan_speed_running = file_exists( "/var/lock/fan_speed.lck") ? "yes" : "no";
          </tr>
  		 <tr>
          <td>Fan Off Temperature (0-99 degrees celsius):</td>
-         <td><input type="text" name="arg2" maxlength="2" value="<?=$fan_speed_cfg['FAN_OFF_TEMP'];?>"></td>
+         <td><input type="text" class="narrow" name="arg2" maxlength="2" value="<?=$fan_speed_cfg['FAN_OFF_TEMP'];?>"></td>
          </tr>
 		 <tr>
          <td>Fan High Temperature (0-99 degrees celsius):</td>
-         <td><input type="text" name="arg3" maxlength="2" value="<?=$fan_speed_cfg['FAN_HIGH_TEMP'];?>"></td>
+         <td><input type="text"  class="narrow" name="arg3" maxlength="2" value="<?=$fan_speed_cfg['FAN_HIGH_TEMP'];?>"></td>
          </tr>
 		 <tr>
          <td>Fan Idle PWM Setting (0-255):</td>
-         <td><input type="text" name="arg4" maxlength="3" value="<?=$fan_speed_cfg['FAN_OFF_PWM'];?>"></td>
+         <td><input type="text"  class="narrow" name="arg4" maxlength="3" value="<?=$fan_speed_cfg['FAN_OFF_PWM'];?>"></td>
          </tr>
 		 <tr>
          <td>Fan Low PWM Setting (0-255):</td>
-         <td><input type="text" name="arg5" maxlength="3" value="<?=$fan_speed_cfg['FAN_LOW_PWM'];?>"></td>
+         <td><input type="text"  class="narrow" name="arg5" maxlength="3" value="<?=$fan_speed_cfg['FAN_LOW_PWM'];?>"></td>
          </tr>
 		 <tr>
          <td>Fan High PWM Setting (0-255):</td>
-         <td><input type="text" name="arg6" maxlength="3" value="<?=$fan_speed_cfg['FAN_HIGH_PWM'];?>"></td>
+         <td><input type="text"  class="narrow" name="arg6" maxlength="3" value="<?=$fan_speed_cfg['FAN_HIGH_PWM'];?>"></td>
          </tr>
 		 <tr>
          <td>How often to check (0-999 seconds):</td>
-         <td><input type="text" name="arg7" maxlength="3" value="<?=$fan_speed_cfg['MINUTES'];?>"></td>
+         <td><input type="text"  class="narrow" name="arg7" maxlength="3" value="<?=$fan_speed_cfg['MINUTES'];?>"></td>
          </tr>
 		 <tr>
          <td></td>
@@ -719,6 +694,16 @@ activateAPPLYBTN(document.fan_speed_settings);
 </script>
 ]]>
 </INLINE>
+</FILE>
+
+<!-- Icon File
+This is the icon displayed in the webGui. We use a LOCAL element here to specify that the icon
+file may be found and copied from the local file system.  This is the icon file we downloaded
+previously.  The reason we do this is that the unRaid webGui directory is reinitialized upon each
+reboot, and using a LOCAL file is faster and more reliable than re-downloaded every time.
+-->
+<FILE Name="/usr/local/emhttp/plugins/&name;/&name;.png">
+<LOCAL>/boot/config/plugins/&name;/&name;.png</LOCAL>
 </FILE>
 
 <!--
