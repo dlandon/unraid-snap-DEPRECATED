@@ -40,6 +40,15 @@ Prepare for installation by removing the script file.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
+# stop fan control
+if [ -f /etc/rc.d/rc.&name; ]
+then
+	/etc/rc.d/rc.&name; stop
+	rm -f /etc/rc.d/rc.&name;
+fi
+
+rm -f -r /usr/local/emhttp/plugins/&name;
+
 if [ -f /boot/config/plugins/&name;/&name;.sh ]
 then
 	VER=$(grep "version=" /boot/config/plugins/&name;/&name;.sh | cut -d\" -f2)
