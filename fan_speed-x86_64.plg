@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "fan_speed">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2015.01.24">
+<!ENTITY version   "2015.01.24a">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/fan_speed-x86_64.plg">
 ]>
 
@@ -205,7 +205,7 @@ fan_speed_start() {
 		else
 			# no-op: if already running do nothing
 			echo "WARNING: $SERVICE_NAME is already running PID:[${LOCK_PID} ]" | logger -t$PROGRAM_NAME
-			exit 2
+			exit 0
 		fi
 	else
 		# no-op: if action not = enabled
@@ -226,7 +226,7 @@ fan_speed_stop() {
 			if [ -f "${LOCKFILE}" ]; then  # in case of empty LOCKFILE
 			    rm $LOCKFILE
 			fi
-			exit 2
+			exit 0
 		fi
 	else
 		# no-op: if action not = disabled
