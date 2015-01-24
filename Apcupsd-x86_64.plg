@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
 <!ENTITY author     "dlandon">
-<!ENTITY version    "2014.12.09">
+<!ENTITY version    "2015.01.24">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 <!ENTITY pkgversion "3.14.12">
 ]>
@@ -14,6 +14,9 @@
          pluginURL="&pluginURL;">
 
 <CHANGES>
+###2015.01.24
+- Fixed status display when UPS is trim or boost.
+
 ###2014.12.09
 - Changed numeric input fields to narrow.
 
