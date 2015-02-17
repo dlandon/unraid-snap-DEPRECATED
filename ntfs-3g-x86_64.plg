@@ -3,20 +3,21 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.09.15">
-<!ENTITY category  "NTFS Write Support">
+<!ENTITY version   "2015.02.17">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
 
 <PLUGIN  name="&name;"
          author="&author;"
          version="&version;"
-         category="&category;"
          pluginURL="&pluginURL;">
 
+<CHANGES>
+###2015.02.17
+- Initial unRAID V6 release.
+</CHANGES>
+
 <!--
-2013-10-19 - first release
-2014-01-24 - Modified for unRAID 6 (64 bit)
 
 The plugin provides ntfs-3g support for unRAID systems.
 
