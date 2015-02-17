@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "apcupsd">
 <!ENTITY author     "dlandon">
-<!ENTITY version    "2015.02.16">
+<!ENTITY version    "2015.02.17">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/Apcupsd-x86_64.plg">
 ]>
 
@@ -13,6 +13,9 @@
          pluginURL="&pluginURL;">
 
 <CHANGES>
+###2015.02.17
+- Change NISIP from loop back ip 127.0.0.1 to 0.0.0.0.
+
 ###2015.02.16
 - Modifications for 6b13.  The apcupsd package is now installed in the 6b13 core.
 
