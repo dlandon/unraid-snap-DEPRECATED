@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "powerdown">
 <!ENTITY author     "WeeboTech/dlandon">
-<!ENTITY version    "2015.02.17">
+<!ENTITY version    "2015.02.22">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
 <!ENTITY pkgversion "2.13">
 ]>
@@ -14,6 +14,8 @@
          pluginURL="&pluginURL;">
 
 <CHANGES>
+##&name;
+
 ###2.13
 - Fixed some issues with the K and S scripts.
 - Added KSV scripts that are called on the stopping_svcs event.  This event is ahead of the unmount event and can help in situations when you need to do some work ahead of the unmount event.

@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "snap">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2014.12.17">
+<!ENTITY version   "2014.02.22">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/snap-x86_64.plg">
 ]>
 
@@ -13,6 +13,8 @@
          pluginURL="&pluginURL;">
 
 <CHANGES>
+##&name;
+
 ###6.05
 - Changes for Dynamix compatibility.
 - Added help.

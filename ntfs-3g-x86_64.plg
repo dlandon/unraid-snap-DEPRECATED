@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2015.02.17">
+<!ENTITY version   "2015.02.22">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
 
@@ -13,6 +13,8 @@
          pluginURL="&pluginURL;">
 
 <CHANGES>
+##&name;
+
 ###2015.02.17
 - Initial unRAID V6 release.
 </CHANGES>
