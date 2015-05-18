@@ -3,9 +3,9 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name       "powerdown">
 <!ENTITY author     "WeeboTech/dlandon">
-<!ENTITY version    "2015.05.15">
+<!ENTITY version    "2015.05.17">
 <!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
-<!ENTITY pkgversion "2.14">
+<!ENTITY pkgversion "2.15">
 ]>
 
 <PLUGIN  name="&name;"
@@ -15,6 +15,9 @@
 
 <CHANGES>
 ##&name;
+
+###2.15
+- Changed 'fuser' killing processes to limit to /mnt/disk[1-9[1-9] and not /mnt/disks* which could cause some issues.
 
 ###2.14
 - Changed 'fuser' parameters from '-k' to '-mvk'.
