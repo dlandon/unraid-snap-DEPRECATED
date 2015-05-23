@@ -38,7 +38,7 @@ removepkg &name;
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz" Run="upgradepkg --install-new">
+<FILE Name="/boot/packages/ntfs-3g-2015.3.14-x86_64-1.txz" Run="upgradepkg --install-new">
 <URL>http://slackbuilds.org/mirror/slackware/slackware64-current/slackware64/a/ntfs-3g-2015.3.14-x86_64-1.txz</URL>
 </FILE>
 
