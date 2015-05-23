@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2015.02.22">
+<!ENTITY version   "2015.05.23">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 ]>
 
@@ -14,6 +14,9 @@
 
 <CHANGES>
 ##&name;
+
+###2015.05.23
+- Updated ntfs3g package to 2015.3.14.
 
 ###2015.02.17
 - Initial unRAID V6 release.
@@ -35,8 +38,7 @@ rm -f -r /usr/local/emhttp/plugins/&name;
 </FILE>
 
 <FILE Name="/boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.oregonstate.edu/slackware64-14.1/slackware64/a/ntfs-3g-2013.1.13-x86_64-1.txz</URL>
-<MD5>de646f44d881b6c4292e353b717792cd</MD5>
+<URL>http://slackbuilds.org/mirror/slackware/slackware64-current/slackware64/a/ntfs-3g-2015.3.14-x86_64-1.txz</URL>
 </FILE>
 
 <FILE Name="/boot/config/plugins/&name;/ntfs-3g.png">
