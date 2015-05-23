@@ -73,9 +73,13 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-rm -f /boot/packages/ntfs-3g-2013.1.13-x86_64-1.txz
+# Remove old 'package' files.
+rm -f $(ls /boot/packages/&name;*.txz 2>/dev/null | grep -v '&pkgversion;')
+
+# Remove the package.
 removepkg &name;
 
+# Remove plugin.
 rm -f -r /usr/local/emhttp/plugins/&name;
 rm -f -r /boot/config/plugins/&name;
 </INLINE>
