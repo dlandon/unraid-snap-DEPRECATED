@@ -34,6 +34,7 @@ Prepare for installation by removing the emhttp/plugins directory.
 <FILE Run="/bin/bash">
 <INLINE>
 rm -f -r /usr/local/emhttp/plugins/&name;
+removepkg &name;
 </INLINE>
 </FILE>
 
