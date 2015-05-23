@@ -41,7 +41,7 @@ rm -f -r /usr/local/emhttp/plugins/&name;
 removepkg &name;
 
 # Remove old 'package' files.
-rm -f $(ls /boot/packages/&name;*.tgz 2>/dev/null | grep -v '&pkgversion;')
+rm -f $(ls /boot/packages/&name;*.txz 2>/dev/null | grep -v '&pkgversion;')
 </INLINE>
 </FILE>
 
