@@ -3,7 +3,7 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ntfs-3g">
 <!ENTITY author    "dlandon">
-<!ENTITY version   "2015.05.23a">
+<!ENTITY version   "2015.05.24">
 <!ENTITY pluginURL "https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g-x86_64.plg">
 <!ENTITY pkgversion "2015.3.14">
 ]>
@@ -15,6 +15,9 @@
 
 <CHANGES>
 ##&name;
+
+###2015.05.24
+- Modify plugin to meet V6 plugin standards.
 
 ###2015.05.23a
 - Updated ntfs3g package to 2015.3.14.
@@ -30,31 +33,115 @@ The plugin provides ntfs-3g support for unRAID systems.
 -->
 
 <!--
+Get the package.
+-->
+<FILE Name="/boot/packages/ntfs-3g-&pkgversion;-x86_64-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackbuilds.org/mirror/slackware/slackware64-current/slackware64/a/ntfs-3g-&pkgversion;-x86_64-1.txz</URL>
+</FILE>
+
+<!--
 Prepare for installation by removing the emhttp/plugins directory.
 -->
 <FILE Run="/bin/bash">
 <INLINE>
-# Remove plugin files.
-rm -f -r /usr/local/emhttp/plugins/&name;
-
-#Remove the package.
-removepkg &name;
+# Remove emhttp files so we can re-install.
+rm /usr/local/emhttp/plugins/&name;/* 2>/dev/null
 
 # Remove old 'package' files.
 rm -f $(ls /boot/packages/&name;*.txz 2>/dev/null | grep -v '&pkgversion;')
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/packages/ntfs-3g-&pkgversion;-x86_64-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackbuilds.org/mirror/slackware/slackware64-current/slackware64/a/ntfs-3g-&pkgversion;-x86_64-1.txz</URL>
-</FILE>
-
-<FILE Name="/boot/config/plugins/&name;/ntfs-3g.png">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/ntfs-3g.png</URL>
-</FILE>
-
-<FILE Name="/usr/local/emhttp/plugins/&name;/ntfs-3g.png">
-<LOCAL>/boot/config/plugins/&name;/ntfs-3g.png</LOCAL>
+<FILE Name="/usr/local/emhttp/plugins/&name;/ntfs-3g.png" Type="base64">
+<INLINE>
+iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEA
+mpwYAAAKTWlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVN3WJP3Fj7f92UPVkLY
+8LGXbIEAIiOsCMgQWaIQkgBhhBASQMWFiApWFBURnEhVxILVCkidiOKgKLhnQYqIWotV
+XDjuH9yntX167+3t+9f7vOec5/zOec8PgBESJpHmomoAOVKFPDrYH49PSMTJvYACFUjg
+BCAQ5svCZwXFAADwA3l4fnSwP/wBr28AAgBw1S4kEsfh/4O6UCZXACCRAOAiEucLAZBS
+AMguVMgUAMgYALBTs2QKAJQAAGx5fEIiAKoNAOz0ST4FANipk9wXANiiHKkIAI0BAJko
+RyQCQLsAYFWBUiwCwMIAoKxAIi4EwK4BgFm2MkcCgL0FAHaOWJAPQGAAgJlCLMwAIDgC
+AEMeE80DIEwDoDDSv+CpX3CFuEgBAMDLlc2XS9IzFLiV0Bp38vDg4iHiwmyxQmEXKRBm
+CeQinJebIxNI5wNMzgwAABr50cH+OD+Q5+bk4eZm52zv9MWi/mvwbyI+IfHf/ryMAgQA
+EE7P79pf5eXWA3DHAbB1v2upWwDaVgBo3/ldM9sJoFoK0Hr5i3k4/EAenqFQyDwdHAoL
+C+0lYqG9MOOLPv8z4W/gi372/EAe/tt68ABxmkCZrcCjg/1xYW52rlKO58sEQjFu9+cj
+/seFf/2OKdHiNLFcLBWK8ViJuFAiTcd5uVKRRCHJleIS6X8y8R+W/QmTdw0ArIZPwE62
+B7XLbMB+7gECiw5Y0nYAQH7zLYwaC5EAEGc0Mnn3AACTv/mPQCsBAM2XpOMAALzoGFyo
+lBdMxggAAESggSqwQQcMwRSswA6cwR28wBcCYQZEQAwkwDwQQgbkgBwKoRiWQRlUwDrY
+BLWwAxqgEZrhELTBMTgN5+ASXIHrcBcGYBiewhi8hgkEQcgIE2EhOogRYo7YIs4IF5mO
+BCJhSDSSgKQg6YgUUSLFyHKkAqlCapFdSCPyLXIUOY1cQPqQ28ggMor8irxHMZSBslED
+1AJ1QLmoHxqKxqBz0XQ0D12AlqJr0Rq0Hj2AtqKn0UvodXQAfYqOY4DRMQ5mjNlhXIyH
+RWCJWBomxxZj5Vg1Vo81Yx1YN3YVG8CeYe8IJAKLgBPsCF6EEMJsgpCQR1hMWEOoJewj
+tBK6CFcJg4Qxwicik6hPtCV6EvnEeGI6sZBYRqwm7iEeIZ4lXicOE1+TSCQOyZLkTgoh
+JZAySQtJa0jbSC2kU6Q+0hBpnEwm65Btyd7kCLKArCCXkbeQD5BPkvvJw+S3FDrFiOJM
+CaIkUqSUEko1ZT/lBKWfMkKZoKpRzame1AiqiDqfWkltoHZQL1OHqRM0dZolzZsWQ8uk
+LaPV0JppZ2n3aC/pdLoJ3YMeRZfQl9Jr6Afp5+mD9HcMDYYNg8dIYigZaxl7GacYtxkv
+mUymBdOXmchUMNcyG5lnmA+Yb1VYKvYqfBWRyhKVOpVWlX6V56pUVXNVP9V5qgtUq1UP
+q15WfaZGVbNQ46kJ1Bar1akdVbupNq7OUndSj1DPUV+jvl/9gvpjDbKGhUaghkijVGO3
+xhmNIRbGMmXxWELWclYD6yxrmE1iW7L57Ex2Bfsbdi97TFNDc6pmrGaRZp3mcc0BDsax
+4PA52ZxKziHODc57LQMtPy2x1mqtZq1+rTfaetq+2mLtcu0W7eva73VwnUCdLJ31Om06
+93UJuja6UbqFutt1z+o+02PreekJ9cr1Dund0Uf1bfSj9Rfq79bv0R83MDQINpAZbDE4
+Y/DMkGPoa5hpuNHwhOGoEctoupHEaKPRSaMnuCbuh2fjNXgXPmasbxxirDTeZdxrPGFi
+aTLbpMSkxeS+Kc2Ua5pmutG003TMzMgs3KzYrMnsjjnVnGueYb7ZvNv8jYWlRZzFSos2
+i8eW2pZ8ywWWTZb3rJhWPlZ5VvVW16xJ1lzrLOtt1ldsUBtXmwybOpvLtqitm63Edptt
+3xTiFI8p0in1U27aMez87ArsmuwG7Tn2YfYl9m32zx3MHBId1jt0O3xydHXMdmxwvOuk
+4TTDqcSpw+lXZxtnoXOd8zUXpkuQyxKXdpcXU22niqdun3rLleUa7rrStdP1o5u7m9yt
+2W3U3cw9xX2r+00umxvJXcM970H08PdY4nHM452nm6fC85DnL152Xlle+70eT7OcJp7W
+MG3I28Rb4L3Le2A6Pj1l+s7pAz7GPgKfep+Hvqa+It89viN+1n6Zfgf8nvs7+sv9j/i/
+4XnyFvFOBWABwQHlAb2BGoGzA2sDHwSZBKUHNQWNBbsGLww+FUIMCQ1ZH3KTb8AX8hv5
+YzPcZyya0RXKCJ0VWhv6MMwmTB7WEY6GzwjfEH5vpvlM6cy2CIjgR2yIuB9pGZkX+X0U
+KSoyqi7qUbRTdHF09yzWrORZ+2e9jvGPqYy5O9tqtnJ2Z6xqbFJsY+ybuIC4qriBeIf4
+RfGXEnQTJAntieTE2MQ9ieNzAudsmjOc5JpUlnRjruXcorkX5unOy553PFk1WZB8OIWY
+EpeyP+WDIEJQLxhP5aduTR0T8oSbhU9FvqKNolGxt7hKPJLmnVaV9jjdO31D+miGT0Z1
+xjMJT1IreZEZkrkj801WRNberM/ZcdktOZSclJyjUg1plrQr1zC3KLdPZisrkw3keeZt
+yhuTh8r35CP5c/PbFWyFTNGjtFKuUA4WTC+oK3hbGFt4uEi9SFrUM99m/ur5IwuCFny9
+kLBQuLCz2Lh4WfHgIr9FuxYji1MXdy4xXVK6ZHhp8NJ9y2jLspb9UOJYUlXyannc8o5S
+g9KlpUMrglc0lamUycturvRauWMVYZVkVe9ql9VbVn8qF5VfrHCsqK74sEa45uJXTl/V
+fPV5bdra3kq3yu3rSOuk626s91m/r0q9akHV0IbwDa0b8Y3lG19tSt50oXpq9Y7NtM3K
+zQM1YTXtW8y2rNvyoTaj9nqdf13LVv2tq7e+2Sba1r/dd3vzDoMdFTve75TsvLUreFdr
+vUV99W7S7oLdjxpiG7q/5n7duEd3T8Wej3ulewf2Re/ranRvbNyvv7+yCW1SNo0eSDpw
+5ZuAb9qb7Zp3tXBaKg7CQeXBJ9+mfHvjUOihzsPcw83fmX+39QjrSHkr0jq/dawto22g
+PaG97+iMo50dXh1Hvrf/fu8x42N1xzWPV56gnSg98fnkgpPjp2Snnp1OPz3Umdx590z8
+mWtdUV29Z0PPnj8XdO5Mt1/3yfPe549d8Lxw9CL3Ytslt0utPa49R35w/eFIr1tv62X3
+y+1XPK509E3rO9Hv03/6asDVc9f41y5dn3m978bsG7duJt0cuCW69fh29u0XdwruTNxd
+eo94r/y+2v3qB/oP6n+0/rFlwG3g+GDAYM/DWQ/vDgmHnv6U/9OH4dJHzEfVI0YjjY+d
+Hx8bDRq98mTOk+GnsqcTz8p+Vv9563Or59/94vtLz1j82PAL+YvPv655qfNy76uprzrH
+I8cfvM55PfGm/K3O233vuO+638e9H5ko/ED+UPPR+mPHp9BP9z7nfP78L/eE8/sl0p8z
+AAAABGdBTUEAALGOfPtRkwAAACBjSFJNAAB6JQAAgIMAAPn/AACA6QAAdTAAAOpgAAA6
+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
+</INLINE>
 </FILE>
 
 <!--
@@ -74,14 +161,13 @@ The 'remove' script.
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
 # Remove old 'package' files.
-rm -f $(ls /boot/packages/&name;*.txz 2>/dev/null | grep -v '&pkgversion;')
+rm -f $(ls /boot/packages/&name;*.txz 2>/dev/null)
 
 # Remove the package.
 removepkg &name;
 
 # Remove plugin.
 rm -f -r /usr/local/emhttp/plugins/&name;
-rm -f -r /boot/config/plugins/&name;
 </INLINE>
 </FILE>
 
