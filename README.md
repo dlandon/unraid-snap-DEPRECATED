@@ -121,3 +121,5 @@ Version 5.26 - SNAP will change themes (white/black) when working with Dynamix.
 Version 5.27 - Modified style sheet to more closely match Dynamix black theme colors.
 
 Version 5.28 - Deprecated support for unRAID v5 at version 5.27.  SNAP for V5 will no longer be updated.  Starting with 5.28, V6 will be the only unRAID version supported.
+
+SNAP for V5 and V6 is deprecated.  There is an equivalent plugin called "Unassigned Devices" for V6 that is integrated better into V6.
