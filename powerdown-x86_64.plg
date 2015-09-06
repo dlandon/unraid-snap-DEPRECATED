@@ -4,7 +4,7 @@
 <!ENTITY name       "powerdown">
 <!ENTITY author     "WeeboTech/dlandon">
 <!ENTITY version    "2015.08.12">
-<!ENTITY pluginURL  "https://github.com/dlandon/unraid-snap/raw/master/powerdown-x86_64.plg">
+<!ENTITY pluginURL  "https://github.com/dlandon/powerdown/raw/master/powerdown-x86_64.plg">
 <!ENTITY pkgversion "2.18">
 ]>
 
@@ -79,14 +79,14 @@ The plugin provides clean powerdown for unRAID systems.
 Get the powerdown bundle.
 -->
 <FILE Name="/boot/config/plugins/&name;/&name;-&version;.tgz">
-<URL>"https://github.com/dlandon/unraid-snap/raw/master/&name;-&version;.tgz"</URL>
+<URL>"https://github.com/dlandon/powerdown/raw/master/&name;-&version;.tgz"</URL>
 </FILE>
 
 <!--
 Get the package.
 -->
 <FILE Name="/boot/packages/powerdown-&pkgversion;-noarch-unRAID.tgz" Run="CTRLALTDEL=YES upgradepkg --install-new">
-<URL>https://github.com/dlandon/unraid-snap/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
+<URL>https://github.com/dlandon/powerdown/raw/master/powerdown-&pkgversion;-noarch-unRAID.tgz</URL>
 </FILE>
 
 <!--
